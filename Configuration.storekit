@@ -1,0 +1,130 @@
+{
+  "identifier": "31F70FAA-8B6E-4D3B-A9C7-1B9DBF7E5F61",
+  "nonRenewingSubscriptions": [],
+  "products": [
+    {
+      "displayPrice": "99.99",
+      "familyShareable": false,
+      "internalID": "PV-IAP-LIFETIME-001",
+      "localizations": [
+        {
+          "description": "Unlock Pith Voice for life. One-time purchase, never expires.",
+          "displayName": "Pith Voice Lifetime",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.hadger.pith.iap.lifetime",
+      "referenceName": "Pith Voice Lifetime",
+      "type": "NonConsumable"
+    }
+  ],
+  "settings": {
+    "_applicationInternalID": "6770544476",
+    "_developerTeamID": "X243T6N439",
+    "_failTransactionsEnabled": false,
+    "_locale": "en_US",
+    "_storefront": "USA",
+    "_storeKitErrors": [
+      {
+        "current": null,
+        "enabled": false,
+        "name": "Load Products"
+      },
+      {
+        "current": null,
+        "enabled": false,
+        "name": "Purchase"
+      },
+      {
+        "current": null,
+        "enabled": false,
+        "name": "Verification"
+      },
+      {
+        "current": null,
+        "enabled": false,
+        "name": "App Store Sync"
+      },
+      {
+        "current": null,
+        "enabled": false,
+        "name": "Subscription Status"
+      },
+      {
+        "current": null,
+        "enabled": false,
+        "name": "App Transaction"
+      },
+      {
+        "current": null,
+        "enabled": false,
+        "name": "Manage Subscriptions Sheet"
+      },
+      {
+        "current": null,
+        "enabled": false,
+        "name": "Refund Request Sheet"
+      },
+      {
+        "current": null,
+        "enabled": false,
+        "name": "Offer Code Redeem Sheet"
+      }
+    ]
+  },
+  "subscriptionGroups": [
+    {
+      "id": "PV-GROUP-MAIN-001",
+      "localizations": [],
+      "name": "pith.main",
+      "subscriptions": [
+        {
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "4.99",
+          "familyShareable": false,
+          "groupNumber": 1,
+          "internalID": "PV-SUB-WEEKLY-001",
+          "introductoryOffer": null,
+          "localizations": [
+            {
+              "description": "Unlimited entries. Weekly. Cancel anytime.",
+              "displayName": "Pith Voice Weekly",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "com.hadger.pith.sub.weekly",
+          "recurringSubscriptionPeriod": "P1W",
+          "referenceName": "Pith Voice Weekly",
+          "subscriptionGroupID": "PV-GROUP-MAIN-001",
+          "type": "RecurringSubscription"
+        },
+        {
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "59.99",
+          "familyShareable": false,
+          "groupNumber": 2,
+          "internalID": "PV-SUB-ANNUAL-001",
+          "introductoryOffer": null,
+          "localizations": [
+            {
+              "description": "Unlimited entries. Annual. Best value.",
+              "displayName": "Pith Voice Annual",
+              "locale": "en_US"
+            }
+          ],
+          "productID": "com.hadger.pith.sub.annual",
+          "recurringSubscriptionPeriod": "P1Y",
+          "referenceName": "Pith Voice Annual",
+          "subscriptionGroupID": "PV-GROUP-MAIN-001",
+          "type": "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version": {
+    "major": 4,
+    "minor": 0
+  }
+}

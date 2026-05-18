@@ -1,0 +1,133 @@
+name: PithVoice
+
+options:
+  bundleIdPrefix: com.hadger
+  developmentLanguage: en
+  deploymentTarget:
+    iOS: "26.0"
+  groupSortPosition: top
+  generateEmptyDirectories: true
+  defaultConfig: Debug
+  createIntermediateGroups: true
+
+configs:
+  Debug: debug
+  Release: release
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    IPHONEOS_DEPLOYMENT_TARGET: "26.0"
+    TARGETED_DEVICE_FAMILY: "1"
+    SWIFT_STRICT_CONCURRENCY: complete
+    CLANG_ENABLE_MODULES: YES
+    ENABLE_USER_SCRIPT_SANDBOXING: NO
+    DEVELOPMENT_TEAM: "$(DEVELOPMENT_TEAM)"
+    CODE_SIGN_STYLE: Automatic
+    GCC_TREAT_WARNINGS_AS_ERRORS: NO
+    SWIFT_TREAT_WARNINGS_AS_ERRORS: NO
+    SWIFT_EMIT_LOC_STRINGS: YES
+  configs:
+    Debug:
+      SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
+      SWIFT_OPTIMIZATION_LEVEL: -Onone
+      ONLY_ACTIVE_ARCH: YES
+      CODE_SIGN_IDENTITY: ""
+      CODE_SIGNING_REQUIRED: NO
+      CODE_SIGNING_ALLOWED: NO
+    Release:
+      SWIFT_OPTIMIZATION_LEVEL: -O
+      ONLY_ACTIVE_ARCH: NO
+      CODE_SIGN_IDENTITY: "Apple Development"
+      CODE_SIGNING_REQUIRED: YES
+      CODE_SIGNING_ALLOWED: YES
+
+configFiles:
+  Debug: PithVoice/Configuration/Secrets.xcconfig
+  Release: PithVoice/Configuration/Secrets.xcconfig
+
+targets:
+  PithVoice:
+    type: application
+    platform: iOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: PithVoice
+        excludes:
+          - "Configuration/Secrets.xcconfig"
+          - "Configuration/Secrets.example.xcconfig"
+    info:
+      path: PithVoice/Generated/Info.plist
+      properties:
+        CFBundleDisplayName: "Pith Voice"
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "1"
+        LSRequiresIPhoneOS: true
+        UILaunchScreen:
+          UIImageRespectsSafeAreaInsets: true
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        UIStatusBarStyle: UIStatusBarStyleDefault
+        UIUserInterfaceStyle: Automatic
+        LSApplicationCategoryType: public.app-category.lifestyle
+        ITSAppUsesNonExemptEncryption: false
+        NSMicrophoneUsageDescription: "Pith Voice records audio you choose to journal. Nothing leaves your iPhone."
+        NSSpeechRecognitionUsageDescription: "Pith Voice transcribes your voice on this device. Nothing leaves your iPhone."
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.hadger.pith
+        PRODUCT_NAME: PithVoice
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ENABLE_PREVIEWS: YES
+        DEVELOPMENT_ASSET_PATHS: ""
+
+  PithVoiceTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "26.0"
+    sources:
+      - PithVoiceTests
+    dependencies:
+      - target: PithVoice
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.hadger.pith.tests
+        BUNDLE_LOADER: "$(TEST_HOST)"
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/PithVoice.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/PithVoice"
+
+  PithVoiceUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    deploymentTarget: "26.0"
+    sources:
+      - PithVoiceUITests
+    dependencies:
+      - target: PithVoice
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.hadger.pith.uitests
+        TEST_TARGET_NAME: PithVoice
+
+schemes:
+  PithVoice:
+    build:
+      targets:
+        PithVoice: all
+        PithVoiceTests: [test]
+        PithVoiceUITests: [test]
+    test:
+      config: Debug
+      gatherCoverageData: true
+      coverageTargets:
+        - PithVoice
+      targets:
+        - PithVoiceTests
+        - PithVoiceUITests
+    run:
+      config: Debug
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release

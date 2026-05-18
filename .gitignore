@@ -12,8 +12,9 @@ xcuserdata/
 *.dSYM.zip
 *.dSYM
 
-# xcodegen-generated project (regenerable from project.yml)
+# xcodegen-generated artifacts (regenerable from project.yml)
 PithVoice.xcodeproj/
+PithVoice/Generated/
 
 # Swift Package Manager
 .build/

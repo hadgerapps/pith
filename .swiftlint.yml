@@ -1,10 +1,10 @@
 included:
-  - Pith
-  - PithTests
-  - PithUITests
+  - PithVoice
+  - PithVoiceTests
+  - PithVoiceUITests
 excluded:
-  - Pith/Resources
-  - Pith/Generated
+  - PithVoice/Resources
+  - PithVoice/Generated
   - "**/.build"
   - "**/DerivedData"
 
