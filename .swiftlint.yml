@@ -1,0 +1,110 @@
+included:
+  - Pith
+  - PithTests
+  - PithUITests
+excluded:
+  - Pith/Resources
+  - Pith/Generated
+  - "**/.build"
+  - "**/DerivedData"
+
+opt_in_rules:
+  - empty_count
+  - empty_string
+  - explicit_init
+  - first_where
+  - last_where
+  - sorted_first_last
+  - contains_over_first_not_nil
+  - contains_over_filter_count
+  - contains_over_filter_is_empty
+  - reduce_into
+  - redundant_nil_coalescing
+  - toggle_bool
+  - unneeded_parentheses_in_closure_argument
+  - vertical_whitespace_closing_braces
+  - vertical_whitespace_opening_braces
+  - closure_spacing
+  - operator_usage_whitespace
+  - prefer_self_type_over_type_of_self
+  - redundant_type_annotation
+  - sorted_imports
+
+disabled_rules:
+  - trailing_comma
+  - todo
+
+line_length:
+  warning: 140
+  error: 200
+  ignores_comments: true
+  ignores_urls: true
+  ignores_function_declarations: true
+
+file_length:
+  warning: 500
+  error: 800
+
+type_body_length:
+  warning: 300
+  error: 500
+
+function_body_length:
+  warning: 60
+  error: 120
+
+cyclomatic_complexity:
+  warning: 12
+  error: 20
+
+identifier_name:
+  min_length: 2
+  excluded:
+    - id
+    - x
+    - y
+    - z
+
+custom_rules:
+  no_print:
+    name: "No print() in shipping code"
+    regex: '(?<!#)\bprint\('
+    match_kinds:
+      - identifier
+    severity: error
+    excluded: ".*Tests.*"
+
+  no_raw_color_in_features:
+    name: "No raw Color literal outside DesignSystem"
+    regex: 'Color\(red:|Color\(hex'
+    severity: error
+    excluded: ".*DesignSystem.*|.*HadgerMark\\.swift|.*AboutView\\.swift"
+
+  no_raw_font_system_outside_design_system:
+    name: "No Font.system size literal outside DesignSystem"
+    regex: '\.font\(\.system\(size'
+    severity: error
+    excluded: ".*DesignSystem.*"
+
+  no_raw_padding_outside_design_system:
+    name: "No numeric .padding() outside DesignSystem"
+    regex: '\.padding\([0-9]'
+    severity: error
+    excluded: ".*DesignSystem.*"
+
+  no_raw_corner_radius_outside_design_system:
+    name: "No numeric .cornerRadius() outside DesignSystem"
+    regex: '\.cornerRadius\([0-9]'
+    severity: error
+    excluded: ".*DesignSystem.*"
+
+  no_third_party_analytics:
+    name: "No third-party analytics SDKs (FR-37)"
+    regex: '^import\s+(Sentry|Mixpanel|Amplitude|FirebaseAnalytics|RevenueCat|Crashlytics|Bugsnag)\b'
+    severity: error
+
+  no_urlsession_dataTask:
+    name: "No raw URLSession network code (FR-37 / SPEC § Network)"
+    regex: 'URLSession\.shared\.(dataTask|data\()'
+    severity: error
+    excluded: ".*Tests.*"
