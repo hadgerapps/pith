@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pith Voice — Design System Preview (2026-05-19)</title>
+<style>
+  :root {
+    --bgCream: #FAFAF6;
+    --surfacePaper: #FFFFFF;
+    --surfaceSun: #F4EFE6;
+    --textInk: #1F1B16;
+    --textStone: #6B6358;
+    --textMute: #9C9388;
+    --hairline: #E5DFD2;
+    --accentMoss: #4A5D3A;
+    --accentMossSoft: #7B8E6A;
+    --chipTag: #EFE9DD;
+    --danger: #A04A37;
+    --ember: #A8481C;
+    --xs: 4px; --s: 8px; --m: 16px; --l: 24px; --xl: 32px; --xxl: 48px; --xxxl: 64px;
+    --rsm: 8px; --rmd: 12px; --rlg: 20px; --rxl: 32px;
+    --s1: 0 1px 3px rgba(31,27,22,0.06);
+    --s2: 0 4px 12px rgba(31,27,22,0.08);
+    --s3: 0 8px 24px rgba(31,27,22,0.10);
+    --motion-fast: 0.18s ease-out;
+    --motion-normal: 0.28s ease-out;
+    --motion-expressive: 0.45s ease-out;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bgCream);
+    color: var(--textInk);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Rounded', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 980px; margin: 0 auto; padding: var(--xxl) var(--xl); }
+  h1 {
+    font-family: 'New York', 'Iowan Old Style', Georgia, serif;
+    font-size: 44px;
+    font-weight: 600;
+    margin: 0 0 var(--xs);
+    letter-spacing: -0.01em;
+  }
+  h2 {
+    font-family: 'New York', 'Iowan Old Style', Georgia, serif;
+    font-size: 26px;
+    font-weight: 500;
+    margin: var(--xxl) 0 var(--m);
+    border-top: 1px solid var(--hairline);
+    padding-top: var(--l);
+  }
+  h3 {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--textStone);
+    margin: var(--l) 0 var(--m);
+  }
+  .meta {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--textStone);
+    font-weight: 500;
+  }
+  .lead { color: var(--textStone); font-size: 17px; line-height: 1.5; margin: 0 0 var(--l); max-width: 60ch; }
+
+  /* Palette */
+  .swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--m); }
+  .swatch {
+    background: var(--surfacePaper);
+    border-radius: var(--rmd);
+    overflow: hidden;
+    box-shadow: var(--s1);
+  }
+  .chip { height: 90px; }
+  .swatch-meta { padding: var(--s) var(--m) var(--m); }
+  .swatch-meta .name { font-weight: 600; font-size: 14px; }
+  .swatch-meta .hex  { font-family: 'SF Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: var(--textStone); }
+
+  /* Typography */
+  .type-row { display: grid; grid-template-columns: 180px 1fr; gap: var(--l); margin-bottom: var(--m); align-items: baseline; padding-bottom: var(--m); border-bottom: 1px solid var(--hairline); }
+  .type-row .label { font-size: 12px; color: var(--textStone); text-transform: uppercase; letter-spacing: 0.08em; }
+
+  .heroSerif    { font-family: 'New York', Georgia, serif; font-size: 34px; font-weight: 600; line-height: 1.18; }
+  .titleSerif   { font-family: 'New York', Georgia, serif; font-size: 22px; font-weight: 500; line-height: 1.22; }
+  .title        { font-size: 20px; font-weight: 600; line-height: 1.25; }
+  .body         { font-size: 17px; font-weight: 400; line-height: 1.45; }
+  .bodyItalic   { font-family: 'New York', Georgia, serif; font-size: 17px; font-style: italic; line-height: 1.45; color: var(--textStone); }
+  .callout      { font-size: 16px; line-height: 1.4; color: var(--textStone); }
+  .caption      { font-size: 13px; line-height: 1.35; color: var(--textStone); }
+  .captionSmall { font-size: 11px; line-height: 1.3; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--textStone); }
+
+  /* Spacing scale */
+  .space-row { display: flex; align-items: center; gap: var(--m); margin-bottom: var(--s); }
+  .space-bar { background: var(--accentMoss); height: 4px; }
+  .space-label { font-size: 12px; color: var(--textStone); width: 80px; }
+
+  /* Radii */
+  .radii { display: flex; gap: var(--m); align-items: flex-end; }
+  .radii .box { background: var(--accentMossSoft); width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; }
+
+  /* Shadows */
+  .shadows { display: flex; gap: var(--l); margin-top: var(--m); }
+  .shadow-card { background: var(--surfacePaper); padding: var(--l); border-radius: var(--rmd); flex: 1; text-align: center; }
+  .sh-1 { box-shadow: var(--s1); }
+  .sh-2 { box-shadow: var(--s2); }
+  .sh-3 { box-shadow: var(--s3); }
+
+  /* Motion */
+  .motion-row { display: flex; align-items: center; gap: var(--m); padding: var(--m); border-bottom: 1px solid var(--hairline); }
+  .pulse { width: 28px; height: 28px; background: var(--accentMoss); border-radius: 999px; animation-iteration-count: infinite; animation-timing-function: cubic-bezier(0,0,0.2,1); }
+  .m-fast       { animation-name: pulse; animation-duration: 0.18s; }
+  .m-normal     { animation-name: pulse; animation-duration: 0.28s; }
+  .m-expressive { animation-name: pulse; animation-duration: 0.45s; }
+  @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.6); opacity: 0; } }
+
+  /* References */
+  .ref-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--m); }
+  .ref { display: flex; flex-direction: column; gap: var(--s); }
+  .ref img { width: 100%; height: 300px; object-fit: cover; object-position: top; border-radius: var(--rsm); background: var(--surfaceSun); }
+  .ref .cap { font-size: 12px; color: var(--textStone); }
+  .ref .co  { font-weight: 600; color: var(--textInk); font-size: 13px; }
+
+  .anti .ref img { filter: grayscale(80%) opacity(0.65); border: 2px solid var(--danger); }
+  .anti .ref .cap::before { content: "❌ ANTI · "; color: var(--danger); font-weight: 600; }
+
+  /* Mock today screen */
+  .mock {
+    background: var(--bgCream);
+    border-radius: var(--rxl);
+    padding: var(--xxl) var(--l) var(--l);
+    border: 1px solid var(--hairline);
+    max-width: 392px;
+    margin: var(--m) auto 0;
+    box-shadow: var(--s2);
+  }
+  .mock .wordmark { font-family: 'New York', Georgia, serif; font-size: 34px; font-weight: 600; }
+  .mock .date { font-size: 11px; color: var(--textStone); text-transform: uppercase; letter-spacing: 0.10em; margin-top: var(--xs); margin-bottom: var(--l); }
+  .mock-card { background: var(--surfacePaper); border-radius: var(--rmd); padding: var(--m); box-shadow: var(--s1); margin-bottom: var(--m); }
+  .mock-card .ts { font-size: 11px; color: var(--textStone); text-transform: uppercase; letter-spacing: 0.08em; }
+  .mock-card .et { font-family: 'New York', Georgia, serif; font-size: 18px; font-weight: 500; margin: var(--xs) 0 var(--s); }
+  .mock-card .sum { font-size: 14px; color: var(--textStone); line-height: 1.5; }
+  .mock-card .tags { margin-top: var(--s); display: flex; gap: var(--xs); }
+  .mock-card .tag { background: var(--chipTag); color: var(--textStone); font-size: 11px; padding: 2px 8px; border-radius: var(--rsm); }
+  .record-btn {
+    background: var(--accentMoss); color: var(--bgCream); border-radius: 999px;
+    width: 88px; height: 88px; margin: var(--l) auto 0; box-shadow: var(--s3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.10em; font-weight: 600;
+  }
+
+  .footer { margin-top: var(--xxxl); padding-top: var(--l); border-top: 1px solid var(--hairline); font-size: 12px; color: var(--textMute); }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="meta">2026-05-19 · Pith Voice v1.2 · Hadger studio</div>
+  <h1>Design system preview</h1>
+  <p class="lead">Generated by the <code>/design-system</code> skill from SPEC § Design vector and 8 reference anchors (NYT, Substack, the Atlantic, the New Yorker, Granola, Otter, Apple Journal, Andante) plus 2 anti-anchors (Calm, Headspace). Editorial register: warm-minimal, considered, adult.</p>
+
+  <h2>Mock — Today screen</h2>
+  <div class="mock">
+    <div class="wordmark">Pith Voice</div>
+    <div class="date">Tuesday, 19 May</div>
+
+    <div class="mock-card">
+      <div class="ts">Today · 3 min</div>
+      <div class="et">The hour before the meeting</div>
+      <div class="sum">Talked about the conversation with Mom on the phone last night — what wasn&rsquo;t said, what I was hoping she&rsquo;d ask. Sat with it. Made the coffee.</div>
+      <div class="tags"><span class="tag">mom</span><span class="tag">expectations</span><span class="tag">morning</span></div>
+    </div>
+    <div class="mock-card">
+      <div class="ts">Yesterday · 5 min</div>
+      <div class="et">After the walk home</div>
+      <div class="sum">The thought I keep coming back to: the difference between being patient and being slow. They&rsquo;re not the same.</div>
+      <div class="tags"><span class="tag">patience</span><span class="tag">work</span></div>
+    </div>
+
+    <div class="record-btn">Record</div>
+  </div>
+
+  <h2>Palette — light mode</h2>
+  <div class="swatches">
+    <div class="swatch"><div class="chip" style="background:var(--bgCream)"></div><div class="swatch-meta"><div class="name">bgCream</div><div class="hex">#FAFAF6</div></div></div>
+    <div class="swatch"><div class="chip" style="background:var(--surfacePaper); border-bottom: 1px solid var(--hairline)"></div><div class="swatch-meta"><div class="name">surfacePaper</div><div class="hex">#FFFFFF</div></div></div>
+    <div class="swatch"><div class="chip" style="background:var(--surfaceSun)"></div><div class="swatch-meta"><div class="name">surfaceSun</div><div class="hex">#F4EFE6</div></div></div>
+    <div class="swatch"><div class="chip" style="background:var(--chipTag)"></div><div class="swatch-meta"><div class="name">chipTag</div><div class="hex">#EFE9DD</div></div></div>
+    <div class="swatch"><div class="chip" style="background:var(--textInk)"></div><div class="swatch-meta"><div class="name">textInk</div><div class="hex">#1F1B16</div></div></div>
+    <div class="swatch"><div class="chip" style="background:var(--textStone)"></div><div class="swatch-meta"><div class="name">textStone</div><div class="hex">#6B6358</div></div></div>
+    <div class="swatch"><div class="chip" style="background:var(--textMute)"></div><div class="swatch-meta"><div class="name">textMute</div><div class="hex">#9C9388</div></div></div>
+    <div class="swatch"><div class="chip" style="background:var(--hairline)"></div><div class="swatch-meta"><div class="name">hairline</div><div class="hex">#E5DFD2</div></div></div>
+    <div class="swatch"><div class="chip" style="background:var(--accentMoss)"></div><div class="swatch-meta"><div class="name">accentMoss</div><div class="hex">#4A5D3A</div></div></div>
+    <div class="swatch"><div class="chip" style="background:var(--accentMossSoft)"></div><div class="swatch-meta"><div class="name">accentMossSoft</div><div class="hex">#7B8E6A</div></div></div>
+    <div class="swatch"><div class="chip" style="background:var(--danger)"></div><div class="swatch-meta"><div class="name">danger</div><div class="hex">#A04A37</div></div></div>
+    <div class="swatch"><div class="chip" style="background:var(--ember)"></div><div class="swatch-meta"><div class="name">ember (studio-only)</div><div class="hex">#A8481C</div></div></div>
+  </div>
+
+  <h2>Typography</h2>
+  <div class="type-row"><div class="label">heroSerif</div><div class="heroSerif">The hour before the meeting</div></div>
+  <div class="type-row"><div class="label">titleSerif</div><div class="titleSerif">After the walk home</div></div>
+  <div class="type-row"><div class="label">title</div><div class="title">Annual</div></div>
+  <div class="type-row"><div class="label">body</div><div class="body">Pith Voice records the audio, transcribes locally, and shows a short summary — everything stays on this iPhone.</div></div>
+  <div class="type-row"><div class="label">bodyItalic (live transcript)</div><div class="bodyItalic">…the thought I keep coming back to is the difference between being patient and being…</div></div>
+  <div class="type-row"><div class="label">callout</div><div class="callout">Restore purchases · Privacy Policy · Terms</div></div>
+  <div class="type-row"><div class="label">caption</div><div class="caption">mom · expectations · morning</div></div>
+  <div class="type-row"><div class="label">captionSmall</div><div class="captionSmall">Tuesday, 19 May</div></div>
+
+  <h2>Spacing — 4-point grid</h2>
+  <div class="space-row"><div class="space-label">xs · 4</div><div class="space-bar" style="width:4px"></div></div>
+  <div class="space-row"><div class="space-label">s · 8</div><div class="space-bar" style="width:8px"></div></div>
+  <div class="space-row"><div class="space-label">m · 16</div><div class="space-bar" style="width:16px"></div></div>
+  <div class="space-row"><div class="space-label">l · 24</div><div class="space-bar" style="width:24px"></div></div>
+  <div class="space-row"><div class="space-label">xl · 32</div><div class="space-bar" style="width:32px"></div></div>
+  <div class="space-row"><div class="space-label">xxl · 48</div><div class="space-bar" style="width:48px"></div></div>
+  <div class="space-row"><div class="space-label">xxxl · 64</div><div class="space-bar" style="width:64px"></div></div>
+
+  <h2>Corner radii</h2>
+  <div class="radii">
+    <div class="box" style="border-radius: 8px">sm · 8</div>
+    <div class="box" style="border-radius: 12px">md · 12</div>
+    <div class="box" style="border-radius: 20px">lg · 20</div>
+    <div class="box" style="border-radius: 32px">xl · 32</div>
+    <div class="box" style="border-radius: 999px">pill</div>
+  </div>
+
+  <h2>Shadows — elevation</h2>
+  <div class="shadows">
+    <div class="shadow-card sh-1"><strong>s1</strong><br><span class="caption">card lift</span></div>
+    <div class="shadow-card sh-2"><strong>s2</strong><br><span class="caption">modal / paywall</span></div>
+    <div class="shadow-card sh-3"><strong>s3</strong><br><span class="caption">record button</span></div>
+  </div>
+
+  <h2>Motion — 200–300 ms ease-out</h2>
+  <div class="motion-row"><div class="pulse m-fast"></div><div><strong>fast (180 ms)</strong> · state changes, toggles</div></div>
+  <div class="motion-row"><div class="pulse m-normal"></div><div><strong>normal (280 ms)</strong> · tab switches, modal presentation</div></div>
+  <div class="motion-row"><div class="pulse m-expressive"></div><div><strong>expressive (450 ms)</strong> · paywall reveal, "Drawing the pith…" shimmer</div></div>
+
+  <h2>Reference anchors (Lazyweb)</h2>
+  <p class="lead">The 8 anchor screenshots that drove the token choices. Editorial register, restrained, none in the anti-pattern zone.</p>
+  <div class="ref-grid">
+    <div class="ref"><img src="references/the-new-yorker-article.png" alt="The New Yorker"><div class="co">the-new-yorker</div><div class="cap">Magazine article detail · editorial serif hero · 0.46</div></div>
+    <div class="ref"><img src="references/substack-onboarding.png" alt="Substack"><div class="co">substack</div><div class="cap">Onboarding · typographic restraint · 0.50</div></div>
+    <div class="ref"><img src="references/the-atlantic-feed.png" alt="The Atlantic"><div class="co">the-atlantic</div><div class="cap">Home feed · featured stories card · 0.46</div></div>
+    <div class="ref"><img src="references/granola-recording.png" alt="Granola"><div class="co">granola</div><div class="cap">Voice recording + transcription · 0.60</div></div>
+    <div class="ref"><img src="references/otter-playback.png" alt="Otter"><div class="co">otter</div><div class="cap">Audio playback w/ summary tabs · 0.60</div></div>
+    <div class="ref"><img src="references/apple-journal-composer.png" alt="Apple Journal"><div class="co">apple-journal</div><div class="cap">Journal entry composer (Apple) · 0.58</div></div>
+    <div class="ref"><img src="references/andante-voice-memo.png" alt="Andante"><div class="co">andante</div><div class="cap">Minimalist voice memo · 0.53</div></div>
+    <div class="ref"><img src="references/persist-paywall.png" alt="Persist"><div class="co">persist</div><div class="cap">Annual + lifetime paywall · 0.43</div></div>
+  </div>
+
+  <h2>Anti-anchors — what we are NOT</h2>
+  <p class="lead">SPEC § Design vector explicitly rejects these registers. They are shown here as the boundary we keep ourselves outside of.</p>
+  <div class="ref-grid anti">
+    <div class="ref"><img src="references/anti-calm-paywall.png" alt="Calm"><div class="co">calm</div><div class="cap">pastel-lifestyle · "Calm-for-young-people"</div></div>
+    <div class="ref"><img src="references/anti-headspace-paywall.png" alt="Headspace"><div class="co">headspace</div><div class="cap">cartoon illustrations · pastel gradients</div></div>
+  </div>
+
+  <div class="footer">
+    Generated 2026-05-19 · <code>.design-system/pith-voice-2026-05-19/</code> · Swift tokens at <code>PithVoice/DesignSystem/</code> · token JSON at <code>tokens/tokens.json</code>
+  </div>
+</div>
+</body>
+</html>

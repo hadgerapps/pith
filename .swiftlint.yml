@@ -64,6 +64,14 @@ identifier_name:
     - x
     - y
     - z
+    - s   # DS t-shirt scale: xs/s/m/l/xl
+    - m
+    - l
+
+type_name:
+  min_length: 2
+  excluded:
+    - DS  # DesignSystem namespace shorthand (industry standard)
 
 custom_rules:
   no_print:
