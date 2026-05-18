@@ -76,7 +76,7 @@ Voice.
 | # | Phase | Status | Commit |
 |---|---|---|---|
 | 0 | Skill audit + hygiene | ✅ done | `b55a534` |
-| 1 | Project skeleton + DesignSystem | ✅ done | `43dc02d` (scaffold) + pending Phase 1 close commit |
+| 1 | Project skeleton + DesignSystem | ✅ done | `43dc02d` (scaffold) + `b4bc31e` (DesignSystem) + SPEC v1.3 paste |
 | 2 | Capture (SpeechAnalyzer) | ⏳ next session | — |
 | 3 | Intelligence (FoundationModels) | ⏳ | — |
 | 4 | Storage + Today + Search | ⏳ | — |
@@ -186,11 +186,9 @@ Phase 1 acceptance (verified 2026-05-19, all green on iPhone 17 Pro simulator):
 
 ## Where we stopped — next steps in priority order
 
-1. **(Optional, owner)** Open
-   `.design-system/pith-voice-2026-05-19/preview.html` in a browser and
-   sanity-check the design lands. If it does, paste `report.md` into
-   `SPEC.md → ## Design system` (currently SPEC has only the Design
-   *vector* — the implemented tokens come from the skill output).
+1. ~~Owner reviews preview.html and pastes report.md into SPEC.~~
+   ✅ Done 2026-05-19. Owner approved the register; SPEC bumped to v1.3
+   with full `## Design system` section.
 2. **Phase 2 — Capture.** Start by:
    - Create `PithVoice/Capture/Recorder.swift` — `AVAudioEngine` + AAC
      output to `Documents/audio/<entry-id>.m4a` with
@@ -271,8 +269,10 @@ bash /Users/vassiliyshmigirivov/.claude/skills/apple-app-team/scripts/probe_bloc
 ## Recent commits
 
 ```
-43dc02d feat(phase-1): scaffold PithVoice Xcode project + tests
-b55a534 chore(phase-0): SPEC v1.2, skill audit, hygiene, vendored swiftlint/swiftformat
+(latest)  docs(spec): integrate /design-system report into SPEC v1.3
+b4bc31e   feat(phase-1): complete DesignSystem + wire RootView, all gates green
+43dc02d   feat(phase-1): scaffold PithVoice Xcode project + tests
+b55a534   chore(phase-0): SPEC v1.2, skill audit, hygiene, vendored swiftlint/swiftformat
 ```
 
 ---

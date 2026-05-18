@@ -1,4 +1,4 @@
-# Pith Voice — Technical Specification v1.2
+# Pith Voice — Technical Specification v1.3
 
 **App:** Pith Voice — a journal you speak, kept on your iPhone
 **Studio:** Hadger (ИП Шмигирилов, Apple Team `X243T6N439`)
@@ -34,6 +34,12 @@ bare "Pith" stem; bundle ID remains `com.hadger.pith` since v1.0)
   new name; new mandatory **Phase 0 — Skill audit** added before any
   code work; Implementation rules updated to require skill discovery
   and use.
+- **v1.3** (2026-05-19, evening) — `## Design system` section appended
+  by the `/design-system` skill after Phase 1 step 8–10. Token JSON,
+  Swift modules, 12 colorsets, 8 reference anchors, 2 anti-anchors,
+  preview.html, and persona validation pass all on disk under
+  `.design-system/pith-voice-2026-05-19/` and `PithVoice/DesignSystem/`.
+  Owner reviewed preview.html and approved the register.
 - **v1.2** (2026-05-19, afternoon) — infrastructure-bound identifiers
   reverted to v1.0 values after live ASC API verification revealed:
   (a) bundle ID `com.hadger.pith` is already registered in Developer
@@ -504,6 +510,197 @@ by Pith Voice's design system:
 - App icon (1024×1024) is a Pith Voice-specific mark designed in Phase 1.
   It is NOT the Hadger Ember mark with a Pith Voice colourway — Hadger is
   the studio, not the app brand.
+
+---
+
+## Design system
+
+> Generated 2026-05-19 by the `/design-system` skill (Phase 1 step 8)
+> from the Design vector above and from a focused reference scan of
+> editorial-register mobile apps via Lazyweb. Owner reviewed
+> `preview.html` and approved the register the same day.
+>
+> Artifacts on disk:
+> - `.design-system/pith-voice-2026-05-19/preview.html` — full token
+>   gallery with mock Today screen
+> - `.design-system/pith-voice-2026-05-19/tokens/tokens.json` — machine-
+>   readable token export
+> - `.design-system/pith-voice-2026-05-19/references/` — 8 anchor PNGs
+>   + 2 anti-anchor PNGs + `_index.json` with similarity scores
+> - `PithVoice/DesignSystem/` — 7 Swift modules implementing the tokens
+> - `PithVoice/Resources/Assets.xcassets/*.colorset/` — 12 colorsets
+>   with light + dark variants
+
+### Reference style anchors (Lazyweb)
+
+| Anchor | Category | Took from it |
+|---|---|---|
+| The New Yorker | Magazines & Newspapers | Editorial serif hero, generous whitespace, publication header treatment |
+| Substack | News | Onboarding typographic restraint, primary CTA, light legal text |
+| The Atlantic | Magazines & Newspapers | Editorial card composition with serif title |
+| Granola | Productivity | Voice recording + transcription pattern, live timer with pause control |
+| Otter | Productivity | Post-recording detail (Summary / Transcript / Chat tabs), waveform scrubber |
+| Apple Journal | Health & Fitness | Journal entry composer pattern from Apple's first-party app — affirms journal-as-place metaphor |
+| Andante | Music | Minimalist voice memo with a single hero element |
+| Persist | Lifestyle | Annual + lifetime + free-trial paywall composition |
+
+Anti-anchors (rejected register, kept as negative example):
+
+- **Calm** — pastel-lifestyle gradients (explicitly anti in § Design vector).
+- **Headspace** — cartoon illustrations; "Calm and Headspace own that
+  language; we are not them."
+
+### Tokens — Color (light mode)
+
+| Token | Hex | Use |
+|---|---|---|
+| `bgCream` | `#FAFAF6` | Primary background (Hadger brand cream) |
+| `surfacePaper` | `#FFFFFF` | Elevated cards, modal sheets |
+| `surfaceSun` | `#F4EFE6` | Subtle warm wash for emphasised rows |
+| `textInk` | `#1F1B16` | Primary text — warm near-black |
+| `textStone` | `#6B6358` | Secondary text |
+| `textMute` | `#9C9388` | Tertiary text, placeholder |
+| `hairline` | `#E5DFD2` | Subtle dividers |
+| `accentMoss` | `#4A5D3A` | Primary accent (130° from Ember in hue — outside ±30° brand-constraint) |
+| `accentMossSoft` | `#7B8E6A` | Accent on tinted surfaces |
+| `chipTag` | `#EFE9DD` | Quiet tag chip background |
+| `danger` | `#A04A37` | Destructive (warm rust, not clinical red) |
+| `success` | `#4A5D3A` | Success state (uses accent — calm, not celebratory) |
+
+Dark mode pairs all of the above. See
+`.design-system/pith-voice-2026-05-19/tokens/tokens.json` and per-
+colorset `Contents.json` files for hex values.
+
+**Studio-locked color (NOT in DesignSystem):** Ember `#A8481C` —
+inline literal in `HadgerMark.swift` and `AboutView.swift` only, per
+§ Brand constraints.
+
+### Tokens — Typography
+
+All tokens use `Font.system(_:design:weight:)` so Dynamic Type scales
+them per NFR-5.
+
+- **`heroSerif`** — system serif (New York), semibold, ~34pt — wordmark, hero.
+- **`titleSerif`** — system serif, medium, ~22pt — entry titles, section headers.
+- **`title`** — SF Pro Rounded semibold, ~20pt — sub-section headers.
+- **`body`** — SF Pro Rounded regular, ~17pt — primary body copy.
+- **`bodyItalic`** — system serif italic, ~17pt — live partial transcript during
+  recording (FR-2). Voice-being-spoken register.
+- **`callout`** — SF Pro Rounded regular, ~16pt.
+- **`caption`** — SF Pro Rounded regular, ~13pt — metadata, tags.
+- **`captionSmall`** — SF Pro Rounded medium, ~11pt — editorial date stamps.
+
+### Tokens — Spacing
+
+4-point grid. `xs: 4` · `s: 8` · `m: 16` · `l: 24` · `xl: 32` ·
+`xxl: 48` · `xxxl: 64`. Every padding / gap / margin must use these
+tokens — SwiftLint custom rule `no_raw_padding_outside_design_system`
+enforces.
+
+### Tokens — Corner radii
+
+`sm: 8` (chips) · `md: 12` (cards, paywall plan rows) · `lg: 20` (Record
+button, modal sheets) · `xl: 32` (large surfaces) · `pill: 999` (status
+pills, secondary CTAs).
+
+### Tokens — Shadows
+
+`s1: 0/1/3, 6%` — subtle card lift.
+`s2: 0/4/12, 8%` — modal / paywall card.
+`s3: 0/8/24, 10%` — Record button at rest.
+
+Sparingly used; at most one elevation step per screen.
+
+### Tokens — Motion
+
+`fast: 0.18s ease-out` — state changes.
+`normal: 0.28s ease-out` — tab switches, modal presentation.
+`expressive: 0.45s ease-out` — paywall reveal, "Drawing the pith…"
+shimmer fade-in. `[inferred]` — Lazyweb is static, durations derived
+from § Visual character.
+
+`Reduce Motion` (NFR-7) drops everything to opacity-only at `.fast`
+duration.
+
+### Implementation rules for Claude Code
+
+These extend the rules in § Implementation rules for Claude Code at
+the file's bottom and are enforced by SwiftLint custom rules in
+`.swiftlint.yml`:
+
+1. **No raw colors outside DesignSystem.** `Color(red:green:blue:)`,
+   `Color(hex:)` — banned outside `PithVoice/DesignSystem/`,
+   `HadgerMark.swift`, and `AboutView.swift`. Use `DS.Color.*`.
+2. **No `.font(.system(size:))` outside DesignSystem.** Use `DS.Font.*`.
+3. **No numeric `.padding(N)` outside DesignSystem.** Use `DS.Space.*`.
+4. **No numeric `.cornerRadius(N)` outside DesignSystem.** Use
+   `DS.Radius.*`.
+5. **No third-party analytics SDK imports** (Sentry, Mixpanel,
+   Amplitude, Firebase, RevenueCat SDK, Crashlytics, Bugsnag) — FR-37.
+6. **No raw `URLSession.shared.dataTask(_)` / `.data(_)`** outside
+   tests — § Network is StoreKit-only.
+
+The pre-merge `grep` check before every commit:
+
+```bash
+# Should return zero hits outside DesignSystem / HadgerMark / AboutView
+grep -rnE '(Color\(red:|Color\(hex|\.font\(\.system\(size|\.padding\([0-9]|\.cornerRadius\([0-9])' \
+  PithVoice/ \
+  --exclude-dir=DesignSystem \
+  --exclude=HadgerMark.swift \
+  --exclude=AboutView.swift
+```
+
+### Design system — Validation log
+
+- **Decision:** `accentMoss = #4A5D3A`.
+  **Source:** § Brand constraints requires accent outside Ember
+  `#A8481C ± 30°` hue range. Moss green at hue ~95° is 130° away from
+  Ember (~20°). Anchors: The Atlantic uses moss-adjacent green for
+  category labels; Granola uses similar muted nature tone.
+  **Rejected alternatives:** deep teal `#1F3A4B` (too clinical,
+  blue-anchored — Sarah/James reject); burnt sienna `#B8624A` (too
+  close to Ember hue, brand-confusable).
+- **Decision:** Background = Cream `#FAFAF6`.
+  **Source:** Hadger brand backdrop per § Brand constraints. NYT
+  Cooking palette is the canonical reference for the warm reading-
+  room feel.
+  **Rejected alternatives:** pure white `#FFFFFF` (clinical, SaaS-cold
+  per anti-register); off-white `#F5F5F5` (no warmth, generic).
+- **Decision:** Hero / entry titles in system serif (New York).
+  **Source:** § Visual character verbatim ("Serif for headlines and
+  entry titles"). Anchors: New Yorker, Atlantic, Substack all use
+  serif hero. Apple Journal uses sans-serif and we deliberately
+  diverge to land the editorial register more strongly than Apple's
+  first-party app.
+  **Rejected:** Sans-only (too SaaS); custom display font (no
+  shipping budget, Dynamic Type compatibility risk).
+- **Decision:** Subtle motion 180–450 ms ease-out, no springs on UI
+  chrome.
+  **Source:** § Visual character verbatim. Reduce-Motion handled per
+  NFR-7. Marked `[inferred]` because Lazyweb is static.
+- **Decision:** Tag chips at `chipTag #EFE9DD` with `caption` font,
+  small radius `sm: 8` (not pill).
+  **Source:** Sarah persona will reject any chip that looks
+  "gamification" — solved with warm taupe background (no saturated
+  hue) and small radius (no full pill, which reads category-bucket).
+
+### Persona validation pass
+
+Step 7 of the `/design-system` skill — feedback simulation against
+the 4 strongest personas from § Validation log.
+
+| Persona | Reaction (simulated) | Verdict |
+|---|---|---|
+| **Sarah** (32, marketing/design IC, Brooklyn) — primary | Opens preview.html, reads as "Substack you'd read on Sunday." Cream + serif + moss lands. No sparkle, no pastel, no streak. | ✅ Passes |
+| **James** (35, journalist, UK, privacy-hawk) | Editorial register. No AI iconography. Moss does not perform tech. | ✅ Passes |
+| **Olivia** (41, psychotherapist, AU) | Warm not medical, no coaching tropes, no "AI therapist" feel. | ✅ Passes |
+| **Carla** (45, perimenopause, US) | Not Calm-for-younger-people. Warm editorial reading-room. | ✅ Passes |
+
+No re-query loop triggered. Owner reviewed `preview.html` on
+2026-05-19 and approved the register. If a structural objection
+surfaces later, the affected axis re-enters Step 5 of the skill (not
+all 6 axes) and tokens + preview regenerate.
 
 ---
 
