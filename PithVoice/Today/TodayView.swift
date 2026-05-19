@@ -16,6 +16,10 @@ struct TodayView: View {
     @State private var distiller = Distiller()
     @State private var searchText: String = ""
     @State private var selectedEntry: Entry?
+    @State private var entitlements = EntitlementStore()
+    @State private var catalog = ProductCatalog()
+    @State private var showPaywall = false
+    @State private var paywallController: PaywallController?
 
     var body: some View {
         NavigationStack {
@@ -43,6 +47,26 @@ struct TodayView: View {
             )
             .navigationDestination(item: $selectedEntry) { entry in
                 EntryDetailView(entry: entry)
+            }
+            .sheet(isPresented: $showPaywall) {
+                if let controller = paywallController {
+                    PaywallView(
+                        catalog: catalog,
+                        controller: controller,
+                        onPurchased: { showPaywall = false }
+                    )
+                    .interactiveDismissDisabled()
+                }
+            }
+            .task {
+                await entitlements.refreshFromStoreKit()
+                await catalog.load()
+                if paywallController == nil {
+                    paywallController = PaywallController(
+                        entitlements: entitlements,
+                        catalog: catalog
+                    )
+                }
             }
         }
     }
@@ -169,6 +193,10 @@ struct TodayView: View {
         Task {
             switch session.phase {
             case .idle, .finished, .failed:
+                if isPaywallBlocking() {
+                    showPaywall = true
+                    return
+                }
                 session.reset()
                 await session.start()
             case .capturing:
@@ -178,6 +206,11 @@ struct TodayView: View {
                 break
             }
         }
+    }
+
+    private func isPaywallBlocking() -> Bool {
+        guard let controller = paywallController else { return false }
+        return controller.shouldPresentPaywall(currentEntryCount: entries.count)
     }
 
     private func persistFinishedCapture() async {
