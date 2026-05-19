@@ -1,14 +1,17 @@
 # Pith Voice — session handoff
 
-> **Status as of 2026-05-20 night:** **Phases 0–9 driven autonomously.**
-> Code complete (12 commits, all gates green). IPA uploaded to TestFlight
-> (Delivery UUID `326b70f7-0e09-4a68-8c87-14ded7bf5ef5`, awaiting Apple
-> processing). All ASC API-accessible blockers cleared: cert + profile
-> created, prices set on 3 products across 175 territories, 350 intro
-> offers created, age rating + content rights declarations populated,
-> app priced FREE, metadata + 10 screenshots uploaded via fastlane
-> deliver. **Three irreducible owner-touchpoints remain** — see § Owner
-> actions below.
+> **Status as of 2026-05-20 night (FINAL):** 🟢 **0 blockers — ready
+> to Submit.** Build 1.0(2) is `VALID` in TestFlight, attached to
+> version 1.0. App Privacy published by owner. iPad Pro 12.9"
+> letterboxed screenshot uploaded to satisfy
+> `APP_IPAD_PRO_3GEN_129` requirement. The last
+> `reviewSubmissionItems` POST returned HTTP 201 with zero
+> blockers — the probe item was DELETEd to keep the draft clean.
+>
+> **One action remains:** owner clicks **"Submit to App Review"** in
+> ASC UI — OR authorizes the next session to fire
+> `POST /v1/reviewSubmissions/85fe6456-.../actions/submit`. Apple
+> permits the API path; the owner just hasn't decided yet.
 
 Read this whole file before doing anything. Pair with [SPEC.md](SPEC.md)
 (v1.3 — single source of truth).
@@ -17,21 +20,38 @@ Read this whole file before doing anything. Pair with [SPEC.md](SPEC.md)
 
 ## TL;DR for next session
 
-1. Read [§ Where we stopped](#where-we-stopped).
-2. Run [§ Quick state check](#quick-state-check) to see what changed
-   (build processing, App Privacy publish, etc.) since this file was
-   written.
-3. If build is `VALID` and `appStoreState` is still
-   `PREPARE_FOR_SUBMISSION` → run [§ Attach build to version](#attach-build-to-version).
-4. Run [§ Probe blockers](#probe-blockers) — what's left determines
-   the next step.
-5. Surface remaining UI-only items to the owner.
+If the owner has already clicked Submit:
+- App will be in `WAITING_FOR_REVIEW`. Watch via § Quick state check.
+- Most first submissions get a Guideline 2.1(b) "business model
+  questions" email within ~24h. Answer in Resolution Center.
+- After approval: `appStoreState = PENDING_DEVELOPER_RELEASE`.
+  releaseType is MANUAL — owner clicks "Release This Version" to ship.
+
+If the owner has NOT yet submitted and asks the next session to do it:
+- Add the version to the draft + submit:
+  ```bash
+  TOKEN=$(ruby ~/.claude/skills/apple-app-team/scripts/asc_jwt.rb \
+    /Users/vassiliyshmigirivov/Apple_apps/AuthKey_9P9W84M53Z.p8 \
+    9P9W84M53Z 3030c9a1-732a-427c-a680-1de04cd5005d)
+
+  # Add version to the draft
+  curl -sX POST -H "Authorization: Bearer $TOKEN" \
+    -H "Content-Type: application/json" \
+    "https://api.appstoreconnect.apple.com/v1/reviewSubmissionItems" \
+    -d '{"data":{"type":"reviewSubmissionItems","relationships":{
+      "reviewSubmission":{"data":{"type":"reviewSubmissions","id":"85fe6456-f8a3-4b6a-9f8e-896dde5b52ef"}},
+      "appStoreVersion":{"data":{"type":"appStoreVersions","id":"715ebb36-f57b-423a-919b-0f2dfd18ba7f"}}
+    }}}' | jq
+
+  # Submit
+  curl -sX POST -H "Authorization: Bearer $TOKEN" \
+    "https://api.appstoreconnect.apple.com/v1/reviewSubmissions/85fe6456-f8a3-4b6a-9f8e-896dde5b52ef/actions/submit" \
+    | jq
+  ```
 
 The owner has granted blanket authorization for autonomous API
-actions. Only stop at Apple's irreducible UI gates (App Privacy
-Publish, Age Rating wizard if needed, final Submit click) — but Age
-Rating is already set via API and Submit can also be done via API if
-the owner confirms they want autonomous submission.
+actions. Only Submit and post-approval "Release This Version" need
+their explicit go-ahead — everything else can be driven via API.
 
 ---
 
@@ -58,8 +78,10 @@ the owner confirms they want autonomous submission.
 | Cert local files (gitignored) | `/tmp/pith-dist.key`, `/tmp/pith-dist.cer`, `/tmp/pith-dist.p12` (password `pith`), `/tmp/pith-dist.csr` |
 | Cert installed in keychain | SHA1 `650DF375A87B12BCD49EE4568BF15CB8C6E28B4B` |
 | Provisioning profile (App Store) | `XHNRFCMFJ9` — "Pith Voice App Store", installed at `~/Library/MobileDevice/Provisioning Profiles/Pith_Voice_App_Store.mobileprovision` |
-| Latest IPA Delivery UUID | **build 2:** `1927c491-9bb6-4bb9-bbe1-e08034e822ce` (uploaded 2026-05-20 02:48 with Siri intent fix) |
+| Latest IPA Delivery UUID | **build 2:** `1927c491-9bb6-4bb9-bbe1-e08034e822ce` (uploaded 2026-05-20 02:48 with Siri intent fix) — `processingState: VALID`, attached to version 1.0 |
 | Previous IPA Delivery UUID | `326b70f7-0e09-4a68-8c87-14ded7bf5ef5` (build 1, 02:26 — rejected ITMS-90626) |
+| iPad Pro 12.9" screenshot set | `21fbdf4e-3878-47df-a023-9a519ae0a2d2` (en-US localization `7670da4a-d28d-46c8-bdc5-1818cb22b0e1`) |
+| iPad Pro 12.9" screenshot | `a3883f9e-660f-45f1-a993-14aaa6e406e0` (state UPLOAD_COMPLETE; 2048×2732 letterbox of paywall PNG on Cream bg) |
 | reviewSubmission draft | `85fe6456-f8a3-4b6a-9f8e-896dde5b52ef` (empty; add version + submit when 0 blockers) |
 | GitHub repo | `hadgerapps/pith` (public, main = `2f371d2`) |
 | GitHub Pages | `https://hadgerapps.github.io/pith/` (`/`, `/privacy/`, `/terms/`, `/support/` — all HTTP 200) |
@@ -196,63 +218,86 @@ All accomplished in commit `2f371d2` without owner intervention:
 
 ---
 
-## Where we stopped
+## Where we stopped — FINAL
 
-The probe of `POST /v1/reviewSubmissionItems` against the draft
-`85fe6456-...` with version `715ebb36-...` returned exactly **4
-remaining blockers** (everything else was cleared via the work above):
+Sequence of probes during this session:
 
-1. **`/v1/appDataUsages/`** — `STATE_ERROR.APP_DATA_USAGES_REQUIRED`:
-   "Answers to what data your app collects and how it's used are
-   needed. You must have published answers to your app's data
-   usages." **Owner UI-only** — no API endpoint exists. Confirmed
-   that `/v1/appDataUsages`, `/v1/appDataUsagePublishingState`,
-   `/v1/apps/{id}/relationships/appDataUsagePublishingState` all
-   return 404. AUTONOMOUS_PIPELINE.md §62 calls this out explicitly.
-2. **`build relationship`** — version doesn't have a build attached.
-   `altool` uploaded the IPA, but Apple needs ~5–15 min to process
-   before the build appears in `/v1/builds`. Once it appears with
-   `processingState: VALID`, attach via API (see [§ Attach build to
-   version](#attach-build-to-version)).
-3. **(Implicit) Subscription Review Screenshot** — the
-   `subscriptionAppStoreReviewScreenshots` upload step from the Soft
-   Day playbook hasn't been done yet. Probably required, may be
-   surfaced by the next probe after #1 and #2 are cleared. Capture
-   the paywall on a simulator and upload via
-   `scripts/upload_screenshot.sh` from apple-app-team.
-4. **Final Submit click** — Apple wants a human acknowledgment.
-   Optional: the owner can authorize the API
-   `POST /v1/reviewSubmissions/{id}/actions/submit` instead.
+**Probe 1** (after build 1 upload, before fixes):
+4 blockers — App Privacy unpublished, no build attached,
+contentRightsDeclaration missing, ageRating missing.
+
+**Mid-session fixes** (all resolved via API):
+- `contentRightsDeclaration = DOES_NOT_USE_THIRD_PARTY_CONTENT`
+  PATCHed onto the app record.
+- Age Rating populated via PATCH on
+  `/v1/ageRatingDeclarations/40335916-...` with all 22 attributes
+  (mix of BOOLEAN and string enums — new ASC API schema).
+- Build 1 rejected by Apple email ITMS-90626 (Siri intent
+  description had "iphone"). Fixed in
+  `StartRecordingIntent.swift`, bumped `CFBundleVersion` 1→2,
+  rebuilt + uploaded build 2 → `processingState: VALID` in ~10s.
+- Build 2 attached to version 1.0 via
+  `PATCH /v1/appStoreVersions/{id}/relationships/build` (HTTP 204).
+- Owner clicked App Privacy → "Data Not Collected" → Publish in
+  ASC UI (after the probe revealed it was the only remaining
+  UI-only blocker; no API exists for that endpoint).
+
+**Probe 2** (after fixes): 1 blocker —
+`APP_IPAD_PRO_3GEN_129` screenshot required (the SoftDay grabli:
+Asset Catalog still emits `AppIcon76x76@2x~ipad.png` even with
+`TARGETED_DEVICE_FAMILY=1` and `UIRequiresFullScreen=true`).
+
+**Resolution:** letterboxed the iPhone 6.9" paywall PNG to 2048×2732
+on Cream background (Pillow inline), created
+`APP_IPAD_PRO_3GEN_129` screenshot set
+`21fbdf4e-3878-47df-a023-9a519ae0a2d2`, ran the 3-step upload flow
+(reserve → PUT to S3 → PATCH `uploaded=true` with MD5), resulting
+screenshot `a3883f9e-660f-45f1-a993-14aaa6e406e0` reached state
+`UPLOAD_COMPLETE`.
+
+**Probe 3 (FINAL):**
+
+```
+POST /v1/reviewSubmissionItems  →  HTTP 201
+{"data": {"id": "ODVm…NDU2", "type": "reviewSubmissionItems", …},
+ "errors": null}
+```
+
+🟢 **Zero blockers.** The probe item was immediately DELETEd
+(HTTP 204) to keep the draft `85fe6456-...` clean for the real
+Submit call.
 
 ---
 
 ## Owner actions remaining
 
-### 1. App Privacy → Publish (irreducible UI)
+### ✅ DONE during this session
 
-Open: <https://appstoreconnect.apple.com/apps/6770544476/distribution/privacy>
+1. ~~App Privacy → Publish~~ — owner completed in ASC UI
+   ("Data Not Collected" published). The
+   `STATE_ERROR.APP_DATA_USAGES_REQUIRED` blocker dropped from the
+   subsequent probe, confirming it stuck.
 
-In the **Data Types** section, declare "**Data Not Collected**" (one
-toggle). A blue **Publish** button appears at the top — tap it. ~2
-min total.
+### Outstanding (1 click left)
 
-This is the only step Apple genuinely has no API for in 2026. The
-underlying data Pith Voice collects is zero (`PrivacyInfo.xcprivacy`
-already declares it), but Apple still requires the human to publish
-the answer.
+**Submit for Review.** Open
+<https://appstoreconnect.apple.com/apps/6770544476/distribution>,
+click **Add for Review** (top right) → review the panel → click
+**Submit to App Review** at the bottom.
 
-### 2. (Optional) Submit for Review
+Or authorize the next Claude session to fire the API submit (see
+TL;DR section above). Apple permits the API path.
 
-After steps 1 and the next session's #3 (paywall screenshot) and
-#2 (build attach), the probe should return 0 blockers. At that point
-either:
+### After approval (~24–72h typical)
 
-- **Owner clicks Submit:** open
-  <https://appstoreconnect.apple.com/apps/6770544476/distribution>
-  and tap "Add for Review → Submit to App Review".
-- **Or owner authorizes autonomous submit:** the next session can
-  `POST /v1/reviewSubmissions/85fe6456-.../actions/submit`. The
-  endpoint exists and works; Apple doesn't technically block it.
+State will move to `PENDING_DEVELOPER_RELEASE` (we set
+`releaseType=MANUAL` at version creation). Open ASC distribution
+page and click **"Release This Version"** when you're ready for the
+app to go live. Apple propagates to the store within ~1 hour.
+
+If Apple rejects (most likely a Guideline 2.1(b) business-model
+questionnaire email — common for first-app submissions), reply in
+Resolution Center. SoftDay's experience: ~30 min to answer.
 
 ---
 
@@ -475,6 +520,8 @@ xcodebuild -project PithVoice.xcodeproj -scheme PithVoice \
 ## Commit history
 
 ```
+e723bc8 fix(phase-9): ITMS-90626 — strip 'iPhone' from Siri Intent description (+ CFBundleVersion 1→2)
+ddc2223 docs(handoff): refresh HANDOFF.md for cross-session resumption after Phase 9
 2f371d2 chore(phase-9): autonomous ASC bring-up via API
 c460fb3 feat(phase-8): fastlane + docs/ + ASC metadata + placeholder screenshots
 05799d1 feat(phase-7): Onboarding + Settings + Export + AppIntents + AboutView + PrivacyInfo (FR-15, FR-28..FR-30, Flow 9)
@@ -488,6 +535,9 @@ b4bc31e feat(phase-1): complete DesignSystem + wire RootView, all gates green
 43dc02d feat(phase-1): scaffold PithVoice Xcode project + tests
 b55a534 chore(phase-0): SPEC v1.2, skill audit, hygiene, vendored swiftlint/swiftformat
 ```
+
+Plus an in-flight commit (after this HANDOFF update) tracking the
+iPad letterbox screenshot script + the final HANDOFF snapshot.
 
 ---
 
@@ -515,6 +565,9 @@ b55a534 chore(phase-0): SPEC v1.2, skill audit, hygiene, vendored swiftlint/swif
 
 ---
 
-_Last updated: 2026-05-20 after Phase 9 commit `2f371d2`. Next session:
-start with the Quick state check, then act on what's changed since
-this file was written._
+_Last updated: 2026-05-20 night, after final 0-blockers probe. State:
+**ready to Submit**. Next session: check whether owner has clicked
+Submit (via Quick state check); if not and they authorize, fire the
+API submit POST documented in TL;DR. If submitted, monitor state and
+prepare for either approval ("Release This Version" click) or
+Resolution Center reply._
