@@ -8,8 +8,11 @@ import Foundation
 /// launch / wake.
 struct StartRecordingIntent: AppIntent {
     static var title: LocalizedStringResource = "Start Pith Voice recording"
+    // Apple ITMS-90626: Siri Intent descriptions cannot contain the word
+    // "iphone". The on-device claim is unchanged — see the App Store
+    // description, AboutView, and the privacy band on the paywall.
     static var description = IntentDescription(
-        "Begin a new Pith Voice journal entry. Audio and transcription stay on your iPhone."
+        "Begin a new Pith Voice journal entry. Everything stays on device."
     )
 
     static var openAppWhenRun: Bool = true

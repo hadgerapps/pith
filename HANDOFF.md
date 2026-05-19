@@ -58,7 +58,8 @@ the owner confirms they want autonomous submission.
 | Cert local files (gitignored) | `/tmp/pith-dist.key`, `/tmp/pith-dist.cer`, `/tmp/pith-dist.p12` (password `pith`), `/tmp/pith-dist.csr` |
 | Cert installed in keychain | SHA1 `650DF375A87B12BCD49EE4568BF15CB8C6E28B4B` |
 | Provisioning profile (App Store) | `XHNRFCMFJ9` — "Pith Voice App Store", installed at `~/Library/MobileDevice/Provisioning Profiles/Pith_Voice_App_Store.mobileprovision` |
-| Latest IPA Delivery UUID | `326b70f7-0e09-4a68-8c87-14ded7bf5ef5` (uploaded 2026-05-20 02:26) |
+| Latest IPA Delivery UUID | **build 2:** `1927c491-9bb6-4bb9-bbe1-e08034e822ce` (uploaded 2026-05-20 02:48 with Siri intent fix) |
+| Previous IPA Delivery UUID | `326b70f7-0e09-4a68-8c87-14ded7bf5ef5` (build 1, 02:26 — rejected ITMS-90626) |
 | reviewSubmission draft | `85fe6456-f8a3-4b6a-9f8e-896dde5b52ef` (empty; add version + submit when 0 blockers) |
 | GitHub repo | `hadgerapps/pith` (public, main = `2f371d2`) |
 | GitHub Pages | `https://hadgerapps.github.io/pith/` (`/`, `/privacy/`, `/terms/`, `/support/` — all HTTP 200) |
@@ -123,7 +124,15 @@ All accomplished in commit `2f371d2` without owner intervention:
   manual signing via `ExportOptions.plist` referencing the named
   profile. IPA = 597 KB.
 - Uploaded IPA to TestFlight via `xcrun altool --upload-app`.
-  Delivery UUID `326b70f7-0e09-4a68-8c87-14ded7bf5ef5`.
+  - Build 1 (Delivery UUID `326b70f7-...`): rejected by Apple email
+    ITMS-90626 "Invalid Siri Support — App Intent description cannot
+    contain 'iphone'". The intent description had "stay on your
+    iPhone" which Apple's static linter flags regardless of context.
+  - Fix in `PithVoice/AppIntentsKit/StartRecordingIntent.swift`:
+    description changed to "Begin a new Pith Voice journal entry.
+    Everything stays on device." `CFBundleVersion` bumped 1 → 2.
+  - Build 2 (Delivery UUID `1927c491-9bb6-4bb9-bbe1-e08034e822ce`)
+    uploaded 02:48, no errors.
 
 ### Pricing (ASC API)
 - For each of the 3 products: queried `pricePoints` paginated to find
