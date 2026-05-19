@@ -1,0 +1,25 @@
+Pith Voice is a voice journal that runs entirely on the user's iPhone.
+
+WHAT THE APP DOES
+1. Records audio (AVAudioEngine).
+2. Transcribes speech on-device using Apple's SpeechAnalyzer / SFSpeechRecognizer API (Speech framework, iOS 26+).
+3. Generates a short summary and 2-4 thematic tags on-device using Apple's FoundationModels framework (Apple Intelligence, iOS 26+).
+4. Persists entries locally via SwiftData with NSFileProtectionComplete.
+5. Offers a paid subscription or lifetime IAP after 2 free entries (hard paywall, no free trial).
+
+VERIFYING THE ON-DEVICE CLAIM
+The app works fully in airplane mode after first launch. Reviewers can verify zero outbound traffic from the app process via Network Link Conditioner or any network proxy. The only outbound traffic the app participates in is StoreKit (Apple-controlled).
+
+DEVICE REQUIREMENT
+Pith Voice requires iPhone 15 Pro or newer (Apple Intelligence is a hard requirement for FoundationModels access). The app gracefully informs the user on unsupported devices with an explanatory screen rather than crashing.
+
+PERMISSIONS
+- Microphone (NSMicrophoneUsageDescription): for recording entries.
+- Speech Recognition (NSSpeechRecognitionUsageDescription): for on-device transcription via SpeechAnalyzer / SFSpeechRecognizer.
+- Notifications (optional): weekly Threads digest only, opt-in.
+
+PAYWALL DEMO
+For Apple's reviewers, the paywall triggers after the 3rd entry attempt. To reach it in a single session, please record 2 short entries and then tap Record again. Reviewers may also use the 'Restore Purchases' flow with any Sandbox account.
+
+LIFETIME IAP
+The non-consumable com.hadger.pith.iap.lifetime ($99.99) is offered alongside the auto-renewable subscriptions, per the precedent set by Pillowtalk (id6484401671) and Murmur PVN (id6762516042). This is not a misrepresented subscription — it is a one-time purchase that grants permanent access to the same features, as the in-paywall copy and Subscription Disclosure block make explicit.

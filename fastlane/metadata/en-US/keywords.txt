@@ -1,0 +1,1 @@
+voice,diary,journal,audio,memo,transcribe,speech,offline,private,mindfulness,gratitude,therapy

@@ -1,0 +1,42 @@
+Speak when you can't write.
+Pith Voice is a quiet, private journal you talk to — themes
+and summaries drawn by Apple Intelligence, every word kept on
+your iPhone. Never uploaded. Never trained on.
+
+A LOCAL JOURNAL, NOT A SERVICE
+Pith Voice doesn't have an account. It doesn't sync to iCloud by
+default. It doesn't make API calls. The AI that summarises your
+day is the iPhone in your hand — Apple Intelligence on-device.
+If your phone is in airplane mode, Pith Voice still works.
+
+THE DAY IS A WALK HOME
+Tap to record. Speak. Stop. In seconds your transcript appears,
+followed by a kind two-sentence summary and a few quiet thematic
+tags — the things you keep coming back to. You can read it once
+and close the app. The act of having said it is the point.
+
+THREADS, NOT GRAPHS
+Once a week, Pith Voice offers a Threads view: the strongest 3–4 themes
+of the past seven days, with a sentence each, and the entry behind
+each. No streak counters. No heat maps. No badges. Just the shape
+of what you've been carrying.
+
+READ ME BACK
+Some days you don't want to make anything new. Pith Voice plays back
+yesterday's entry in your own voice — proof to yourself that
+yesterday existed. The on-ramp back, after the missed weeks.
+
+WHAT PITH VOICE DOES NOT DO
+We don't reply. We don't coach. We don't suggest topics. The
+journal is yours; we just make it easier to keep.
+
+PRIVACY, LITERALLY
+- All transcription runs on-device (Apple SpeechAnalyzer, iOS 26+)
+- All AI summaries run on-device (Apple Intelligence, Foundation
+  Models)
+- No accounts, no servers, no analytics SDKs, no telemetry
+- No iCloud sync by default (export is manual and explicit)
+- Verifiable via Tracker Control or any network proxy
+
+Pith Voice is made by Hadger — a one-person iOS studio that ships calm,
+private apps for iPhone.
