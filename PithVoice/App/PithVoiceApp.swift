@@ -15,7 +15,7 @@ struct PithVoiceApp: App {
 
     var body: some Scene {
         WindowGroup {
-            TodayView()
+            RootTabView()
                 .modelContainer(modelContainer)
         }
     }
