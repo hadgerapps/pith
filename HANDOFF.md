@@ -1,17 +1,15 @@
 # Pith Voice — session handoff
 
-> **Status as of 2026-05-20 night (FINAL):** 🟢 **0 blockers — ready
-> to Submit.** Build 1.0(2) is `VALID` in TestFlight, attached to
-> version 1.0. App Privacy published by owner. iPad Pro 12.9"
-> letterboxed screenshot uploaded to satisfy
-> `APP_IPAD_PRO_3GEN_129` requirement. The last
-> `reviewSubmissionItems` POST returned HTTP 201 with zero
-> blockers — the probe item was DELETEd to keep the draft clean.
+> **Status as of 2026-05-20 (SUBMITTED):** 🚀 **`WAITING_FOR_REVIEW`.**
+> Owner clicked Submit in ASC UI at `2026-05-19T22:35:07.875Z`.
+> Apple's queue has the draft `85fe6456-...` with version 1.0 +
+> build 2 attached. Nothing more to do until Apple's verdict —
+> typically 12–48h for first submissions, often preceded by a
+> Guideline 2.1(b) "business model questions" email (~5 min to
+> answer in Resolution Center).
 >
-> **One action remains:** owner clicks **"Submit to App Review"** in
-> ASC UI — OR authorizes the next session to fire
-> `POST /v1/reviewSubmissions/85fe6456-.../actions/submit`. Apple
-> permits the API path; the owner just hasn't decided yet.
+> **Next owner action (after approval):** click "Release This
+> Version" — `releaseType=MANUAL`, so Apple won't auto-publish.
 
 Read this whole file before doing anything. Pair with [SPEC.md](SPEC.md)
 (v1.3 — single source of truth).
@@ -20,38 +18,52 @@ Read this whole file before doing anything. Pair with [SPEC.md](SPEC.md)
 
 ## TL;DR for next session
 
-If the owner has already clicked Submit:
-- App will be in `WAITING_FOR_REVIEW`. Watch via § Quick state check.
-- Most first submissions get a Guideline 2.1(b) "business model
-  questions" email within ~24h. Answer in Resolution Center.
-- After approval: `appStoreState = PENDING_DEVELOPER_RELEASE`.
-  releaseType is MANUAL — owner clicks "Release This Version" to ship.
+Submission is in Apple's queue. Run the state check below to see
+where it is:
 
-If the owner has NOT yet submitted and asks the next session to do it:
-- Add the version to the draft + submit:
-  ```bash
-  TOKEN=$(ruby ~/.claude/skills/apple-app-team/scripts/asc_jwt.rb \
-    /Users/vassiliyshmigirivov/Apple_apps/AuthKey_9P9W84M53Z.p8 \
-    9P9W84M53Z 3030c9a1-732a-427c-a680-1de04cd5005d)
+```bash
+TOKEN=$(ruby ~/.claude/skills/apple-app-team/scripts/asc_jwt.rb \
+  /Users/vassiliyshmigirivov/Apple_apps/AuthKey_9P9W84M53Z.p8 \
+  9P9W84M53Z 3030c9a1-732a-427c-a680-1de04cd5005d)
 
-  # Add version to the draft
-  curl -sX POST -H "Authorization: Bearer $TOKEN" \
-    -H "Content-Type: application/json" \
-    "https://api.appstoreconnect.apple.com/v1/reviewSubmissionItems" \
-    -d '{"data":{"type":"reviewSubmissionItems","relationships":{
-      "reviewSubmission":{"data":{"type":"reviewSubmissions","id":"85fe6456-f8a3-4b6a-9f8e-896dde5b52ef"}},
-      "appStoreVersion":{"data":{"type":"appStoreVersions","id":"715ebb36-f57b-423a-919b-0f2dfd18ba7f"}}
-    }}}' | jq
+echo "===reviewSubmission==="
+curl -sH "Authorization: Bearer $TOKEN" \
+  "https://api.appstoreconnect.apple.com/v1/reviewSubmissions/85fe6456-f8a3-4b6a-9f8e-896dde5b52ef" \
+  | jq '.data.attributes'
 
-  # Submit
-  curl -sX POST -H "Authorization: Bearer $TOKEN" \
-    "https://api.appstoreconnect.apple.com/v1/reviewSubmissions/85fe6456-f8a3-4b6a-9f8e-896dde5b52ef/actions/submit" \
-    | jq
-  ```
+echo "===appStoreVersion==="
+curl -sH "Authorization: Bearer $TOKEN" \
+  "https://api.appstoreconnect.apple.com/v1/appStoreVersions/715ebb36-f57b-423a-919b-0f2dfd18ba7f" \
+  | jq '{appStoreState: .data.attributes.appStoreState, releaseType: .data.attributes.releaseType}'
+```
+
+Likely states to see:
+
+| `state` / `appStoreState` | What it means | What to do |
+|---|---|---|
+| `WAITING_FOR_REVIEW` | In Apple's queue | Nothing. Wait. |
+| `IN_REVIEW` | Reviewer assigned | Nothing. Wait. |
+| `PENDING_DEVELOPER_RELEASE` | ✅ APPROVED. `releaseType=MANUAL` so it waits for owner click. | Tell owner to click "Release This Version" in ASC. |
+| `READY_FOR_SALE` | Live in App Store. | Celebrate. Start `2_<NextApp>/`. |
+| `REJECTED` / `DEVELOPER_REJECTED` | Apple flagged something or owner needs to address | Open Resolution Center, read the message, fix in code or metadata, push new build (`CFBundleVersion` 2→3), re-submit via API. |
+| `METADATA_REJECTED` | Metadata-only issue (description, screenshots, IAPs) | Fix via API, no rebuild needed. |
+
+If a Guideline 2.1(b) email arrives ("we'd like to know more about
+your business model"): standard first-submission probe. Reply in
+Resolution Center — Apple usually wants brief answers to:
+1. What does the app do? (one paragraph; we have this in App Review
+   notes already)
+2. Does it integrate with any APIs / services? (Apple-only:
+   FoundationModels, SpeechAnalyzer, StoreKit)
+3. How do users acquire it? (App Store)
+4. Is there any back-end? (No — fully on-device)
+5. Account requirements? (None)
+
+This is in `fastlane/metadata/review_information/notes.txt` already
+in a condensed form — paste into the Resolution Center reply.
 
 The owner has granted blanket authorization for autonomous API
-actions. Only Submit and post-approval "Release This Version" need
-their explicit go-ahead — everything else can be driven via API.
+actions. Only "Release This Version" click needs their go-ahead.
 
 ---
 
@@ -269,35 +281,27 @@ Submit call.
 
 ---
 
-## Owner actions remaining
+## Owner actions
 
 ### ✅ DONE during this session
 
-1. ~~App Privacy → Publish~~ — owner completed in ASC UI
-   ("Data Not Collected" published). The
-   `STATE_ERROR.APP_DATA_USAGES_REQUIRED` blocker dropped from the
-   subsequent probe, confirming it stuck.
+1. ~~App Privacy → "Data Not Collected" → Publish~~ — owner clicked
+   Publish in ASC UI mid-session. Confirmed via probe: the
+   `STATE_ERROR.APP_DATA_USAGES_REQUIRED` blocker dropped.
+2. ~~Submit to App Review~~ — owner clicked Submit at
+   `2026-05-19T22:35:07.875Z`. `reviewSubmission` state moved to
+   `WAITING_FOR_REVIEW`. Confirmed via
+   `GET /v1/reviewSubmissions/85fe6456-...`.
 
-### Outstanding (1 click left)
+### Pending (no action yet)
 
-**Submit for Review.** Open
-<https://appstoreconnect.apple.com/apps/6770544476/distribution>,
-click **Add for Review** (top right) → review the panel → click
-**Submit to App Review** at the bottom.
+**Release This Version** — only relevant *after* Apple approves the
+app. State will be `PENDING_DEVELOPER_RELEASE`. Open
+<https://appstoreconnect.apple.com/apps/6770544476/distribution> and
+click "Release This Version". App goes live within ~1h.
 
-Or authorize the next Claude session to fire the API submit (see
-TL;DR section above). Apple permits the API path.
-
-### After approval (~24–72h typical)
-
-State will move to `PENDING_DEVELOPER_RELEASE` (we set
-`releaseType=MANUAL` at version creation). Open ASC distribution
-page and click **"Release This Version"** when you're ready for the
-app to go live. Apple propagates to the store within ~1 hour.
-
-If Apple rejects (most likely a Guideline 2.1(b) business-model
-questionnaire email — common for first-app submissions), reply in
-Resolution Center. SoftDay's experience: ~30 min to answer.
+If rejected: read message in Resolution Center, fix, resubmit (the
+next session can handle code + metadata fixes + re-submit via API).
 
 ---
 
@@ -565,9 +569,9 @@ iPad letterbox screenshot script + the final HANDOFF snapshot.
 
 ---
 
-_Last updated: 2026-05-20 night, after final 0-blockers probe. State:
-**ready to Submit**. Next session: check whether owner has clicked
-Submit (via Quick state check); if not and they authorize, fire the
-API submit POST documented in TL;DR. If submitted, monitor state and
-prepare for either approval ("Release This Version" click) or
-Resolution Center reply._
+_Last updated: 2026-05-20, after owner submitted via ASC UI at
+`2026-05-19T22:35:07Z`. State: **`WAITING_FOR_REVIEW`**. Next
+session: run the Quick state check; if state is unchanged, nothing
+to do. If `PENDING_DEVELOPER_RELEASE`, tell owner to click Release.
+If rejection email arrives, handle via Resolution Center + code/
+metadata fix + API re-submit._
