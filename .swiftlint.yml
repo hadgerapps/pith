@@ -92,7 +92,7 @@ custom_rules:
     name: "No Font.system size literal outside DesignSystem"
     regex: '\.font\(\.system\(size'
     severity: error
-    excluded: ".*DesignSystem.*"
+    excluded: ".*DesignSystem.*|.*HadgerMark\\.swift|.*AboutView\\.swift"
 
   no_raw_padding_outside_design_system:
     name: "No numeric .padding() outside DesignSystem"

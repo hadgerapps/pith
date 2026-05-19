@@ -1,44 +1,51 @@
 import SwiftUI
 
-/// Root tab bar — Today · Threads · Settings (Flow 3 step 2).
+/// Root tab bar — Today · Threads · Settings (Flow 3 step 2). Gated on the
+/// onboarding flag (FR-29) — first-launch users see OnboardingFlow until
+/// they tap Done.
 struct RootTabView: View {
-    var body: some View {
-        TabView {
-            TodayView()
-                .tabItem {
-                    Label("Today", systemImage: "sun.max")
-                }
-            ThreadsView()
-                .tabItem {
-                    Label("Threads", systemImage: "square.text.square")
-                }
-            SettingsPlaceholderView()
-                .tabItem {
-                    Label("Settings", systemImage: "gearshape")
-                }
-        }
-        .tint(DS.Color.accent)
-    }
-}
+    @State private var onboarding = OnboardingState()
+    @State private var entitlements = EntitlementStore()
+    @State private var catalog = ProductCatalog()
+    @State private var paywallController: PaywallController?
 
-/// Phase 5 placeholder — full Settings lands in Phase 7 (FR-30).
-struct SettingsPlaceholderView: View {
     var body: some View {
-        NavigationStack {
-            ZStack(alignment: .topLeading) {
-                DS.Color.background.ignoresSafeArea()
-                VStack(alignment: .leading, spacing: DS.Space.m) {
-                    Text("Settings")
-                        .font(DS.Font.heroSerif)
-                        .foregroundStyle(DS.Color.textInk)
-                    Text("Subscription, export, and preferences arrive in the next build.")
-                        .font(DS.Font.body)
-                        .foregroundStyle(DS.Color.textStone)
-                    Spacer()
-                }
-                .padding(.horizontal, DS.Space.l)
-                .padding(.top, DS.Space.xl)
+        Group {
+            if onboarding.isCompleted {
+                tabs
+            } else {
+                OnboardingFlow(state: onboarding)
             }
+        }
+        .task {
+            await entitlements.refreshFromStoreKit()
+            await catalog.load()
+            if paywallController == nil {
+                paywallController = PaywallController(entitlements: entitlements, catalog: catalog)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var tabs: some View {
+        if let controller = paywallController {
+            TabView {
+                TodayView()
+                    .tabItem { Label("Today", systemImage: "sun.max") }
+                ThreadsView()
+                    .tabItem { Label("Threads", systemImage: "square.text.square") }
+                SettingsView(
+                    onboarding: onboarding,
+                    entitlements: entitlements,
+                    controller: controller
+                )
+                .tabItem { Label("Settings", systemImage: "gearshape") }
+            }
+            .tint(DS.Color.accent)
+        } else {
+            ProgressView()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(DS.Color.background.ignoresSafeArea())
         }
     }
 }
