@@ -69,11 +69,11 @@ final class Recorder {
     }
 
     /// Returns the audio destination URL for a given entry ID.
-    static func audioURL(for entryID: UUID) -> URL {
+    nonisolated static func audioURL(for entryID: UUID) -> URL {
         documentsAudioDirectory().appendingPathComponent("\(entryID.uuidString).m4a")
     }
 
-    static func documentsAudioDirectory() -> URL {
+    nonisolated static func documentsAudioDirectory() -> URL {
         let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let audio = docs.appendingPathComponent("audio", isDirectory: true)
         try? FileManager.default.createDirectory(
