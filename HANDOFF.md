@@ -1,21 +1,21 @@
 # Pith Voice — session handoff
 
-> **Status as of 2026-05-21 (REJECTED → FIXES APPLIED, awaiting owner
-> Resolution Center reply):** Apple reviewed build 2 on 2026-05-21
-> (iPad Air 11" M3) and rejected with 3 issues — all addressed in code +
-> ASC API. **Build 3 uploaded + attached, paywall review screenshots
+> **Status as of 2026-05-21 evening (RESOLUTION CENTER REPLY SENT —
+> awaiting Apple re-review):** Apple reviewed build 2 on 2026-05-21
+> (iPad Air 11" M3) and rejected with 3 issues — all addressed in code
+> + ASC API. **Build 3 uploaded + attached, paywall review screenshots
 > uploaded for all 3 IAPs, Terms of Use link added to description.**
+> Owner replied to the rejection in Resolution Center on 2026-05-21
+> confirming the fixes.
 >
-> The original `reviewSubmission 85fe6456-...` is in
-> `UNRESOLVED_ISSUES`. Apple's flow for rejection-with-fixes is for the
-> owner to **reply in Resolution Center** confirming the fixes —
-> Apple then re-reviews the same submission with the updated build
-> and metadata. No new submission needed (and Apple's API does NOT
-> permit detaching the version from the existing submission once it's
-> been submitted).
+> `reviewSubmission 85fe6456-...` still reads `UNRESOLVED_ISSUES`
+> (state machine doesn't flip on reply alone — Apple processes
+> replies asynchronously, typically <24h to move back into
+> `IN_REVIEW`). Version 1.0 reads `PREPARE_FOR_SUBMISSION` with
+> build 3 (`10a554f6-...`) attached.
 >
-> **Next owner action:** see § "Owner: Resolution Center reply" — the
-> exact text to paste is provided.
+> **Next owner action (only after approval):** click "Release This
+> Version" when state moves to `PENDING_DEVELOPER_RELEASE`.
 
 Read this whole file before doing anything. Pair with [SPEC.md](SPEC.md)
 (v1.3 — single source of truth).
