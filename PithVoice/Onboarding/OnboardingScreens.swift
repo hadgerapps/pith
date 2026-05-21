@@ -43,7 +43,7 @@ struct WhatStaysHereScreen: View {
 struct PermissionsScreen: View {
     private let copy = "Pith Voice needs the microphone (to record) and " +
         "Speech Recognition (to transcribe — locally). " +
-        "Tap Allow and respond Yes to both system prompts."
+        "Tap Continue and respond to both system prompts."
 
     var body: some View {
         VStack(alignment: .leading, spacing: DS.Space.l) {

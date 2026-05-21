@@ -40,3 +40,16 @@ PRIVACY, LITERALLY
 
 Pith Voice is made by Hadger — a one-person iOS studio that ships calm,
 private apps for iPhone.
+
+SUBSCRIPTION TERMS
+- Pith Voice Weekly: $4.99/week, auto-renews until cancelled.
+- Pith Voice Annual: $59.99/year, auto-renews until cancelled.
+- Pith Voice Lifetime: $99.99 one-time, never expires.
+- Two free entries before the paywall. No free trial.
+- Payment is charged to your Apple ID at confirmation of purchase.
+  Subscriptions auto-renew unless cancelled at least 24 hours before
+  the current period ends. Manage or cancel in Settings → Apple ID →
+  Subscriptions.
+
+Privacy Policy: https://hadgerapps.github.io/pith/privacy/
+Terms of Use (EULA): https://hadgerapps.github.io/pith/terms/

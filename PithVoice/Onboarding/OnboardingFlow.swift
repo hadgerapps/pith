@@ -57,8 +57,13 @@ struct OnboardingFlow: View {
                     .pithShadow(.s2)
             }
             .buttonStyle(.plain)
-            if step >= 1 {
-                Button("Skip") { state.markCompleted() }
+            // Per App Review Guideline 5.1.1(iv): no way to bypass the
+            // permission prompt at the permissions screen — the only path
+            // forward is Continue, which triggers the iOS permission sheet.
+            // Optional surfaces (Weekly Digest, step 3) keep a Skip
+            // affordance.
+            if step == 3 {
+                Button("Maybe later") { state.markCompleted() }
                     .font(DS.Font.callout)
                     .foregroundStyle(DS.Color.textStone)
             }
@@ -69,8 +74,8 @@ struct OnboardingFlow: View {
         switch step {
         case 0: "Continue"
         case 1: "Continue"
-        case 2: "Allow"
-        default: "Done"
+        case 2: "Continue" // Triggers mic + Speech prompts; never named "Allow" (5.1.1(iv)).
+        default: "Turn on weekly digest"
         }
     }
 
