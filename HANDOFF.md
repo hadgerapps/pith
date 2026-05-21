@@ -1,15 +1,21 @@
 # Pith Voice — session handoff
 
-> **Status as of 2026-05-20 (SUBMITTED):** 🚀 **`WAITING_FOR_REVIEW`.**
-> Owner clicked Submit in ASC UI at `2026-05-19T22:35:07.875Z`.
-> Apple's queue has the draft `85fe6456-...` with version 1.0 +
-> build 2 attached. Nothing more to do until Apple's verdict —
-> typically 12–48h for first submissions, often preceded by a
-> Guideline 2.1(b) "business model questions" email (~5 min to
-> answer in Resolution Center).
+> **Status as of 2026-05-21 (REJECTED → FIXES APPLIED, awaiting owner
+> Resolution Center reply):** Apple reviewed build 2 on 2026-05-21
+> (iPad Air 11" M3) and rejected with 3 issues — all addressed in code +
+> ASC API. **Build 3 uploaded + attached, paywall review screenshots
+> uploaded for all 3 IAPs, Terms of Use link added to description.**
 >
-> **Next owner action (after approval):** click "Release This
-> Version" — `releaseType=MANUAL`, so Apple won't auto-publish.
+> The original `reviewSubmission 85fe6456-...` is in
+> `UNRESOLVED_ISSUES`. Apple's flow for rejection-with-fixes is for the
+> owner to **reply in Resolution Center** confirming the fixes —
+> Apple then re-reviews the same submission with the updated build
+> and metadata. No new submission needed (and Apple's API does NOT
+> permit detaching the version from the existing submission once it's
+> been submitted).
+>
+> **Next owner action:** see § "Owner: Resolution Center reply" — the
+> exact text to paste is provided.
 
 Read this whole file before doing anything. Pair with [SPEC.md](SPEC.md)
 (v1.3 — single source of truth).
@@ -90,10 +96,15 @@ actions. Only "Release This Version" click needs their go-ahead.
 | Cert local files (gitignored) | `/tmp/pith-dist.key`, `/tmp/pith-dist.cer`, `/tmp/pith-dist.p12` (password `pith`), `/tmp/pith-dist.csr` |
 | Cert installed in keychain | SHA1 `650DF375A87B12BCD49EE4568BF15CB8C6E28B4B` |
 | Provisioning profile (App Store) | `XHNRFCMFJ9` — "Pith Voice App Store", installed at `~/Library/MobileDevice/Provisioning Profiles/Pith_Voice_App_Store.mobileprovision` |
-| Latest IPA Delivery UUID | **build 2:** `1927c491-9bb6-4bb9-bbe1-e08034e822ce` (uploaded 2026-05-20 02:48 with Siri intent fix) — `processingState: VALID`, attached to version 1.0 |
-| Previous IPA Delivery UUID | `326b70f7-0e09-4a68-8c87-14ded7bf5ef5` (build 1, 02:26 — rejected ITMS-90626) |
+| Latest IPA Delivery UUID | **build 3:** `10a554f6-39cc-4dff-9a6e-790a5f5c6f75` (uploaded 2026-05-21 with permission-UX fix per Guideline 5.1.1(iv)) — `processingState: VALID`, attached to version 1.0 |
+| Build 2 Delivery UUID | `1927c491-9bb6-4bb9-bbe1-e08034e822ce` (the rejected build that Apple reviewed) |
+| Build 1 Delivery UUID | `326b70f7-0e09-4a68-8c87-14ded7bf5ef5` (rejected ITMS-90626 before review) |
 | iPad Pro 12.9" screenshot set | `21fbdf4e-3878-47df-a023-9a519ae0a2d2` (en-US localization `7670da4a-d28d-46c8-bdc5-1818cb22b0e1`) |
-| iPad Pro 12.9" screenshot | `a3883f9e-660f-45f1-a993-14aaa6e406e0` (state UPLOAD_COMPLETE; 2048×2732 letterbox of paywall PNG on Cream bg) |
+| iPad Pro 12.9" screenshot | `a3883f9e-660f-45f1-a993-14aaa6e406e0` (state UPLOAD_COMPLETE; 2048×2732 letterbox) |
+| Weekly sub review screenshot | `d295951e-f66d-4e17-b968-7247ef06032c` (paywall PNG on subscription `6770545728`) |
+| Annual sub review screenshot | `66401131-3a2c-4c64-8e13-4346d3b9e426` (paywall PNG on subscription `6770545519`) |
+| Lifetime IAP review screenshot | `1e2c7e7c-b2d1-42eb-a94b-c23d256cd10f` (paywall PNG on inAppPurchase `6770546034`, uploaded via `/v1/inAppPurchaseAppStoreReviewScreenshots`) |
+| Orphan empty submission (ignore) | `0154e2e7-e692-4e21-a3eb-87eacd15992d` — created when attempting to bypass Apple's submission-state lock; cannot DELETE (Apple forbids `DELETE` on `reviewSubmissions`); zero items so harmless. |
 | reviewSubmission draft | `85fe6456-f8a3-4b6a-9f8e-896dde5b52ef` (empty; add version + submit when 0 blockers) |
 | GitHub repo | `hadgerapps/pith` (public, main = `2f371d2`) |
 | GitHub Pages | `https://hadgerapps.github.io/pith/` (`/`, `/privacy/`, `/terms/`, `/support/` — all HTTP 200) |
@@ -281,27 +292,60 @@ Submit call.
 
 ---
 
-## Owner actions
+## Owner: Resolution Center reply (1 action needed now)
 
-### ✅ DONE during this session
+Open <https://appstoreconnect.apple.com/apps/6770544476/distribution>
+and click **"View App Review Issues & Messages"** (red badge). Reply
+to the 2026-05-21 message with the text below — Apple re-reviews the
+same submission once you reply.
 
-1. ~~App Privacy → "Data Not Collected" → Publish~~ — owner clicked
-   Publish in ASC UI mid-session. Confirmed via probe: the
-   `STATE_ERROR.APP_DATA_USAGES_REQUIRED` blocker dropped.
-2. ~~Submit to App Review~~ — owner clicked Submit at
-   `2026-05-19T22:35:07.875Z`. `reviewSubmission` state moved to
-   `WAITING_FOR_REVIEW`. Confirmed via
-   `GET /v1/reviewSubmissions/85fe6456-...`.
+> Hello,
+>
+> Thank you for the detailed feedback. We've addressed all three
+> issues in build 1.0(3), now uploaded and attached to version 1.0,
+> and in the updated metadata:
+>
+> **Guideline 5.1.1(iv) — Permission request UX**
+> The onboarding permissions screen has been revised. The primary
+> button now reads "Continue" (no longer "Allow"). The "Skip"
+> affordance has been removed from this screen — the only path
+> forward is "Continue", which immediately triggers the iOS
+> microphone and Speech Recognition permission prompts. The
+> "Maybe later" affordance now only appears on the optional Weekly
+> Digest notification screen, which does not gate any core
+> functionality.
+>
+> **Guideline 3.1.2(c) — Subscription EULA / Terms of Use**
+> The App Store description has been updated with a SUBSCRIPTION
+> TERMS section listing all three products (title, length, price,
+> auto-renewal language), plus functional links to our Privacy
+> Policy (https://hadgerapps.github.io/pith/privacy/) and Terms of
+> Use (https://hadgerapps.github.io/pith/terms/). Both URLs return
+> HTTP 200 and are served from our public GitHub Pages repo.
+>
+> **Guideline 2.1(b) — In-App Purchases not submitted for review**
+> All three In-App Purchase products now have App Review
+> screenshots uploaded:
+> - com.hadger.pith.sub.weekly: paywall screenshot uploaded
+> - com.hadger.pith.sub.annual: paywall screenshot uploaded
+> - com.hadger.pith.iap.lifetime: paywall screenshot uploaded
+> The screenshot shows the full paywall view with all three plans
+> visible, including the Subscription Disclosure block (auto-
+> renewal terms, cancellation via Settings → Apple ID), Privacy
+> Policy and Terms of Use links, and the Restore Purchases button.
+>
+> Please proceed with the re-review of build 1.0(3). Happy to
+> provide additional materials or a screen recording if helpful.
+>
+> Thanks,
+> Vasiliy
 
-### Pending (no action yet)
+### Pending (no action yet — only after approval)
 
-**Release This Version** — only relevant *after* Apple approves the
-app. State will be `PENDING_DEVELOPER_RELEASE`. Open
+**Release This Version** — when state moves to
+`PENDING_DEVELOPER_RELEASE`, open
 <https://appstoreconnect.apple.com/apps/6770544476/distribution> and
 click "Release This Version". App goes live within ~1h.
-
-If rejected: read message in Resolution Center, fix, resubmit (the
-next session can handle code + metadata fixes + re-submit via API).
 
 ---
 
