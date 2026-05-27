@@ -1,21 +1,53 @@
 # Pith Voice — session handoff
 
-> **Status as of 2026-05-21 evening (RESOLUTION CENTER REPLY SENT —
-> awaiting Apple re-review):** Apple reviewed build 2 on 2026-05-21
-> (iPad Air 11" M3) and rejected with 3 issues — all addressed in code
-> + ASC API. **Build 3 uploaded + attached, paywall review screenshots
-> uploaded for all 3 IAPs, Terms of Use link added to description.**
-> Owner replied to the rejection in Resolution Center on 2026-05-21
-> confirming the fixes.
+> **Status as of 2026-05-28 (RE-SUBMITTED via API after rejection
+> cycle 1):** 🚀 `WAITING_FOR_REVIEW`. Apple's 2026-05-26 message
+> ("Please resubmit the app for review") was the trigger — Apple
+> accepted the fixes but explicitly required a new submission.
 >
-> `reviewSubmission 85fe6456-...` still reads `UNRESOLVED_ISSUES`
-> (state machine doesn't flip on reply alone — Apple processes
-> replies asynchronously, typically <24h to move back into
-> `IN_REVIEW`). Version 1.0 reads `PREPARE_FOR_SUBMISSION` with
-> build 3 (`10a554f6-...`) attached.
+> **What I did to recover** (2026-05-27 20:28 UTC):
+> 1. `PATCH /v1/reviewSubmissions/85fe6456-...` with
+>    `{"canceled": true}` → state went `UNRESOLVED_ISSUES → CANCELING
+>    → COMPLETE` in ~10 seconds, freeing the version from the lock.
+> 2. `POST /v1/reviewSubmissionItems` adding version 1.0
+>    (`715ebb36-...`) to the previously-orphan draft `0154e2e7-...`
+>    (which I had created in the failed first-resubmit attempt and
+>    couldn't delete).
+> 3. `PATCH /v1/reviewSubmissions/0154e2e7-...` with
+>    `{"submitted": true}` → state went `READY_FOR_REVIEW →
+>    WAITING_FOR_REVIEW`.
+>
+> Now in Apple's queue under submission `0154e2e7-e692-4e21-a3eb-87eacd15992d`.
 >
 > **Next owner action (only after approval):** click "Release This
 > Version" when state moves to `PENDING_DEVELOPER_RELEASE`.
+
+## NEW LEARNING — undocumented ASC API actions
+
+Apple's docs say cancel/submit happen via `POST /actions/{name}`,
+but those return 404. The actual API uses PATCH on the submission's
+attributes:
+
+| Intent | PATCH endpoint | Body attributes | Result state |
+|---|---|---|---|
+| Cancel a submitted/in-review submission | `/v1/reviewSubmissions/{id}` | `{"canceled": true}` | `CANCELING` → `COMPLETE` (~10s) |
+| Submit a draft (`READY_FOR_REVIEW`) | `/v1/reviewSubmissions/{id}` | `{"submitted": true}` | `WAITING_FOR_REVIEW` immediately |
+
+Both return HTTP 200 with the updated resource. This replaces the
+need for any `actions/submit` or `actions/cancel` paths that don't
+exist. Document this in apple-app-team's `references/asc_api.md`.
+
+## NEW LEARNING — Resolution Center messages live in a separate channel
+
+`GET /v1/reviewSubmissions/{id}` returns only top-level attributes
+(state, submittedDate, platform). It does NOT include the message
+thread. If Apple replies in Resolution Center, the submission's
+`state` may stay `UNRESOLVED_ISSUES` indefinitely while Apple awaits
+the developer's next action — the actual message ("please resubmit",
+"acknowledged", etc.) is only visible in the ASC UI's Messages
+section. **Status monitoring must include manual polling of the
+Messages UI**, or it will miss Apple's prompts. There is no direct
+API for fetching reviewSubmissionMessages as of 2026-05.
 
 Read this whole file before doing anything. Pair with [SPEC.md](SPEC.md)
 (v1.3 — single source of truth).
@@ -105,7 +137,8 @@ actions. Only "Release This Version" click needs their go-ahead.
 | Annual sub review screenshot | `66401131-3a2c-4c64-8e13-4346d3b9e426` (paywall PNG on subscription `6770545519`) |
 | Lifetime IAP review screenshot | `1e2c7e7c-b2d1-42eb-a94b-c23d256cd10f` (paywall PNG on inAppPurchase `6770546034`, uploaded via `/v1/inAppPurchaseAppStoreReviewScreenshots`) |
 | Orphan empty submission (ignore) | `0154e2e7-e692-4e21-a3eb-87eacd15992d` — created when attempting to bypass Apple's submission-state lock; cannot DELETE (Apple forbids `DELETE` on `reviewSubmissions`); zero items so harmless. |
-| reviewSubmission draft | `85fe6456-f8a3-4b6a-9f8e-896dde5b52ef` (empty; add version + submit when 0 blockers) |
+| reviewSubmission (active) | `0154e2e7-e692-4e21-a3eb-87eacd15992d` — submitted 2026-05-27T20:28:17Z via API PATCH `submitted=true`. state `WAITING_FOR_REVIEW` |
+| reviewSubmission (previous, cancelled) | `85fe6456-f8a3-4b6a-9f8e-896dde5b52ef` — original submission. Apple rejected on 2026-05-21, owner replied 2026-05-24, Apple's 2026-05-26 message asked to resubmit; cancelled 2026-05-27 via PATCH `canceled=true` to free the version. state `COMPLETE` |
 | GitHub repo | `hadgerapps/pith` (public, main = `2f371d2`) |
 | GitHub Pages | `https://hadgerapps.github.io/pith/` (`/`, `/privacy/`, `/terms/`, `/support/` — all HTTP 200) |
 | Support email | `hadger.support@gmail.com` |
