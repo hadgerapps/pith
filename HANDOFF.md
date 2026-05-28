@@ -1,23 +1,39 @@
 # Pith Voice — session handoff
 
-> **Status as of 2026-05-28 (RE-SUBMITTED via API after rejection
-> cycle 1):** 🚀 `WAITING_FOR_REVIEW`. Apple's 2026-05-26 message
-> ("Please resubmit the app for review") was the trigger — Apple
-> accepted the fixes but explicitly required a new submission.
+> **Status as of 2026-05-28 night (RE-SUBMITTED via API after rejection
+> cycle 2):** 🚀 `WAITING_FOR_REVIEW` on **submission
+> `811a54e3-c1b4-484d-9134-f7bad1538982`** (submitted
+> 2026-05-28T08:30:54Z).
 >
-> **What I did to recover** (2026-05-27 20:28 UTC):
-> 1. `PATCH /v1/reviewSubmissions/85fe6456-...` with
->    `{"canceled": true}` → state went `UNRESOLVED_ISSUES → CANCELING
->    → COMPLETE` in ~10 seconds, freeing the version from the lock.
-> 2. `POST /v1/reviewSubmissionItems` adding version 1.0
->    (`715ebb36-...`) to the previously-orphan draft `0154e2e7-...`
->    (which I had created in the failed first-resubmit attempt and
->    couldn't delete).
-> 3. `PATCH /v1/reviewSubmissions/0154e2e7-...` with
->    `{"submitted": true}` → state went `READY_FOR_REVIEW →
->    WAITING_FOR_REVIEW`.
+> Apple rejected submission `0154e2e7-...` on 2026-05-28 with 2 issues:
+> Guideline 2.1(b) ("Weekly and Annual IAPs not submitted for review")
+> and Guideline 2.3.3 ("screenshots don't show the actual app in use").
 >
-> Now in Apple's queue under submission `0154e2e7-e692-4e21-a3eb-87eacd15992d`.
+> Root cause of 2.1(b) found via API diff with SoftDay: both Pith subs
+> had only the USA base subscriptionPrice set (`prices.count = 1`)
+> instead of 175 territory-specific prices. The previous PATCH-with-
+> included pattern only created USA — Apple's auto-propagation never
+> kicked in. **Fix:** GET `/v1/subscriptionPricePoints/{USA-pp}/equalizations`
+> returns 174 pricePoints for the equivalent USA tier in every other
+> territory. Walk those, PATCH the sub with each as a new
+> subscriptionPrice. Both subs now have 175 prices and state
+> `READY_TO_SUBMIT`.
+>
+> Lifetime IAP is currently in `DEVELOPER_ACTION_NEEDED` — its
+> previous localization went `REJECTED` during cycle 2 review;
+> created a fresh `PREPARE_FOR_SUBMISSION` localization, expanded
+> availability to all 175 territories, but state didn't transition
+> back. Likely needs to ride along with the next review pass to
+> auto-recover. If Apple rejects on Lifetime: PATCH lifecycle is
+> blocked from API, must use ASC UI to mark it for re-review.
+>
+> Screenshots: rewrote `scripts/make_screenshots.py` to render real
+> Pith Voice UI inside a soft iPhone frame for each screen (Today
+> list with 3 entries, Recording with waveform + serif-italic live
+> transcript, Paywall with 3 plan cards, Threads with 3 theme cards,
+> Entry Detail with playback + summary + tags + transcript). Old 5×2
+> hero placeholders + 1 iPad letterbox replaced via API (DELETE old,
+> 3-step upload new).
 >
 > **Next owner action (only after approval):** click "Release This
 > Version" when state moves to `PENDING_DEVELOPER_RELEASE`.
@@ -137,8 +153,12 @@ actions. Only "Release This Version" click needs their go-ahead.
 | Annual sub review screenshot | `66401131-3a2c-4c64-8e13-4346d3b9e426` (paywall PNG on subscription `6770545519`) |
 | Lifetime IAP review screenshot | `1e2c7e7c-b2d1-42eb-a94b-c23d256cd10f` (paywall PNG on inAppPurchase `6770546034`, uploaded via `/v1/inAppPurchaseAppStoreReviewScreenshots`) |
 | Orphan empty submission (ignore) | `0154e2e7-e692-4e21-a3eb-87eacd15992d` — created when attempting to bypass Apple's submission-state lock; cannot DELETE (Apple forbids `DELETE` on `reviewSubmissions`); zero items so harmless. |
-| reviewSubmission (active) | `0154e2e7-e692-4e21-a3eb-87eacd15992d` — submitted 2026-05-27T20:28:17Z via API PATCH `submitted=true`. state `WAITING_FOR_REVIEW` |
-| reviewSubmission (previous, cancelled) | `85fe6456-f8a3-4b6a-9f8e-896dde5b52ef` — original submission. Apple rejected on 2026-05-21, owner replied 2026-05-24, Apple's 2026-05-26 message asked to resubmit; cancelled 2026-05-27 via PATCH `canceled=true` to free the version. state `COMPLETE` |
+| reviewSubmission (active) | `811a54e3-c1b4-484d-9134-f7bad1538982` — submitted 2026-05-28T08:30:54Z via API PATCH `submitted=true`. state `WAITING_FOR_REVIEW` |
+| reviewSubmission (cycle 2, rejected/cancelled) | `0154e2e7-e692-4e21-a3eb-87eacd15992d` — submitted 2026-05-27, rejected 2026-05-28 (2.1b IAPs + 2.3.3 screenshots), cancelled to free version. state `COMPLETE` |
+| reviewSubmission (cycle 1, cancelled) | `85fe6456-f8a3-4b6a-9f8e-896dde5b52ef` — original. Apple rejected 2026-05-21, owner replied 2026-05-24, Apple's 2026-05-26 message asked to resubmit, cancelled 2026-05-27. state `COMPLETE` |
+| Subs price territories | Weekly 175 / Annual 175 (was 1 each — fix via `/equalizations` walk + PATCH-with-included pattern × 174 per sub). |
+| Subscription review screenshots | Weekly `d295951e-...`, Annual `66401131-...`, Lifetime IAP `1e2c7e7c-...` — all `assetDeliveryState.state = COMPLETE`. |
+| App screenshots (active) | 6.9" set `91a4162b-...` has 5 (01_Today/02_Record/03_Paywall/04_Threads/05_Detail). 6.1" set `3639c790-...` has 5 same. iPad Pro 12.9" set `21fbdf4e-...` has 1 letterboxed paywall. All rendered via Python+PIL with phone frame mockup + real UI inside per 2.3.3 guideline. |
 | GitHub repo | `hadgerapps/pith` (public, main = `2f371d2`) |
 | GitHub Pages | `https://hadgerapps.github.io/pith/` (`/`, `/privacy/`, `/terms/`, `/support/` — all HTTP 200) |
 | Support email | `hadger.support@gmail.com` |
