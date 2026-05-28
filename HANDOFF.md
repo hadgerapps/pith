@@ -53,6 +53,36 @@ Both return HTTP 200 with the updated resource. This replaces the
 need for any `actions/submit` or `actions/cancel` paths that don't
 exist. Document this in apple-app-team's `references/asc_api.md`.
 
+## NEW STUDIO RULE — never auto-submit after rejection fix
+
+**Effective 2026-05-28** (lesson learned from Pith Voice cycle 2).
+
+After applying fixes to a rejected submission, the pipeline MUST
+follow this exact order:
+
+1. Apply code / metadata / API fixes.
+2. Report to owner exactly what was done.
+3. Surface every UI click needed (with the exact ASC URL + button
+   label).
+4. Prepare a Resolution Center reply text for the owner.
+5. **WAIT for owner "ок"** — do NOT submit a new
+   `reviewSubmission` autonomously.
+6. Owner sends Resolution Center reply (anchors context for
+   reviewer).
+7. Owner does the UI-only steps (if any).
+8. ONLY THEN submit the new submission (UI click or API
+   PATCH `submitted=true`).
+
+Violation in Pith cycle 2: I auto-cancelled the rejected
+submission and PATCH-submitted a new one before the owner had a
+chance to reply in Resolution Center. Cancelling the old
+submission closed its message thread (Apple disables the Reply
+button when state=COMPLETE). The owner now has to use the ASC
+Contact Us form or appreview@apple.com to provide context.
+
+Going forward this rule is encoded in every hadger-* skill's
+post-rejection flow.
+
 ## NEW LEARNING — Resolution Center messages live in a separate channel
 
 `GET /v1/reviewSubmissions/{id}` returns only top-level attributes
