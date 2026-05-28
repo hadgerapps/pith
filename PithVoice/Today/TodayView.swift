@@ -92,7 +92,10 @@ struct TodayView: View {
                 selectedEntry = first
             }
         case .record:
-            session.beginMockCapturing(partial: "…the thought I keep coming back to is the difference between being patient and being slow. They're not the same.")
+            session.beginMockCapturing(
+                partial: "…the thought I keep coming back to is the difference between "
+                    + "being patient and being slow. They're not the same."
+            )
         default:
             break
         }

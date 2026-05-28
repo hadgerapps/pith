@@ -9,12 +9,7 @@ struct RootTabView: View {
     @State private var entitlements = EntitlementStore()
     @State private var catalog = ProductCatalog()
     @State private var paywallController: PaywallController?
-    @State private var selectedTab: Tab = {
-        switch UITestSeed.route {
-        case .threads: .threads
-        default: .today
-        }
-    }()
+    @State private var selectedTab: Tab = UITestSeed.route == .threads ? .threads : .today
 
     enum Tab: Hashable { case today, threads, settings }
 
