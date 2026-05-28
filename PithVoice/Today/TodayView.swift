@@ -59,15 +59,42 @@ struct TodayView: View {
                 }
             }
             .task {
-                await entitlements.refreshFromStoreKit()
-                await catalog.load()
+                // Initialise paywall controller sync so the sheet has
+                // content immediately if UITestSeed.route triggers it
+                // before StoreKit roundtrips finish.
                 if paywallController == nil {
                     paywallController = PaywallController(
                         entitlements: entitlements,
                         catalog: catalog
                     )
                 }
+                applyUITestRoute()
+                await entitlements.refreshFromStoreKit()
+                await catalog.load()
             }
+        }
+    }
+
+    /// Honor UITestSeed route on launch (App Store screenshot mode).
+    private func applyUITestRoute() {
+        switch UITestSeed.route {
+        case .paywall:
+            Task { @MainActor in
+                // Defer one runloop tick so the parent view layout finishes
+                // before SwiftUI evaluates the sheet's content closure.
+                // Otherwise paywallController can be captured as nil even
+                // though it was set synchronously above.
+                try? await Task.sleep(nanoseconds: 300_000_000)
+                showPaywall = true
+            }
+        case .detail:
+            if let first = entries.first {
+                selectedEntry = first
+            }
+        case .record:
+            session.beginMockCapturing(partial: "…the thought I keep coming back to is the difference between being patient and being slow. They're not the same.")
+        default:
+            break
         }
     }
 

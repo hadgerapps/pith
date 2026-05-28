@@ -73,4 +73,13 @@ final class CaptureSession {
         transcriber.cancel()
         phase = .idle
     }
+
+    /// UITest-only entry point — paint the "actively capturing" UI without
+    /// actually starting the mic. Used by App Store screenshot capture so
+    /// the simulator (no real microphone) can render the recording surface
+    /// for review submission. Gated by UITestSeed.route; production code
+    /// paths never call this.
+    func beginMockCapturing(partial: String) {
+        phase = .capturing(partial: partial, since: Date())
+    }
 }

@@ -1,9 +1,74 @@
 # Pith Voice — session handoff
 
-> **Status as of 2026-05-28 night (RE-SUBMITTED via API after rejection
-> cycle 2):** 🚀 `WAITING_FOR_REVIEW` on **submission
-> `811a54e3-c1b4-484d-9134-f7bad1538982`** (submitted
-> 2026-05-28T08:30:54Z).
+> **Status as of 2026-05-28 evening (CYCLE 3 REJECTED — fixes ready
+> locally, NOT yet uploaded to ASC):**
+>
+> ```
+> reviewSubmission 811a54e3-...   : UNRESOLVED_ISSUES
+> appStoreVersion 1.0              : REJECTED
+> Lifetime IAP (6770546034)        : DEVELOPER_ACTION_NEEDED
+> ```
+>
+> Apple reviewed and rejected build 1.0(3) again. The exact rejection
+> reason is in ASC Resolution Center (no API to fetch — owner must
+> open ASC UI and read). Most likely repeat of 2.3.3 (the screenshots
+> uploaded in cycle 2 fix were still placeholder-style "phone in a
+> phone" mockups, NOT real UI) and/or 2.1(b) (Lifetime IAP locked in
+> DEVELOPER_ACTION_NEEDED, can't be auto-recovered via API).
+>
+> **What's READY LOCALLY but NOT YET in ASC:**
+> - 10 real-simulator screenshots captured (5 × iPhone 17 Pro Max
+>   1320×2868 + 5 × iPhone 17 Pro 1206×2622) via `xcrun simctl io`
+>   on actually-running app with seeded data. Files in
+>   `fastlane/screenshots/en-US/iPhone 17 Pro Max-{01_Today..05_Detail}.png`
+>   and `iPhone 17 Pro-*.png`. Verified visually: real UI fills the
+>   frame, no marketing band, no nested phone frames. Paywall renders
+>   correctly via the new full-screen mode (RootTabView gates on
+>   `UITestSeed.route == .paywall`).
+> - Code changes (NOT committed yet at HANDOFF write time):
+>   - `PithVoice/Storage/UITestSeed.swift` (NEW) — launch-arg
+>     handling for `-uitest-seed` + `-uitest-screen <route>`; seeds
+>     3 demo entries with realistic content + summary + tags; gated
+>     so production users never trigger.
+>   - `PithVoice/App/RootTabView.swift` — eager `paywallController`
+>     init synchronously inside `.task` (so tabs render without
+>     waiting on StoreKit), plus full-screen PaywallView render when
+>     route == .paywall (SwiftUI `.sheet` doesn't reliably present
+>     content during simctl screenshot capture — direct rendering is
+>     deterministic).
+>   - `PithVoice/Today/TodayView.swift` — eager controller init +
+>     `applyUITestRoute()` that runs BEFORE `await catalog.load()`
+>     (otherwise the StoreKit await blocks forever in simulator
+>     without a Configuration.storekit-linked scheme).
+>   - `PithVoice/Capture/CaptureSession.swift` — new
+>     `beginMockCapturing(partial:)` method that paints the
+>     "actively capturing" UI state without starting the mic;
+>     used by route == .record screenshot capture only.
+>
+> **Immediate first action for next session** (in this order):
+>
+> 1. **`git add . && git commit && git push`** the code changes above
+>    so this state is on `main`.
+> 2. **Read Apple's Resolution Center message in ASC UI** to confirm
+>    cycle 3 rejection reasons (no API; open `https://appstoreconnect.apple.com/apps/6770544476/distribution`
+>    and click "View App Review Issues & Messages"). Confirm whether
+>    it's 2.1(b) IAPs, 2.3.3 screenshots, or something new.
+> 3. **Upload the 10 local screenshots** to ASC via API (DELETE old +
+>    3-step upload new). Same flow we used before — see § Useful
+>    snippets below.
+> 4. **Regenerate iPad letterbox** from the new paywall screenshot:
+>    `python3 -c "from PIL import Image; ..."` (see § Useful snippets).
+> 5. **DO NOT auto-resubmit** (per § NEW STUDIO RULE). Surface the
+>    fix list + Resolution Center reply text to the owner; wait for
+>    their explicit "ок" before the cancel+resubmit cycle (which is
+>    `PATCH /v1/reviewSubmissions/{id}` with `canceled=true` then
+>    `submitted=true` on a fresh draft, see § Useful snippets).
+> 6. **Lifetime IAP fix is owner UI-only** — surface this clearly. URL:
+>    `https://appstoreconnect.apple.com/apps/6770544476/inapppurchases`
+>    → open `Pith Lifetime` → click Save (or Submit for Review).
+>    All API attempts to bump it out of DEVELOPER_ACTION_NEEDED returned
+>    409 STATE_ERROR. Apple's UI has a specific admin path we can't
+>    reach.
 >
 > Apple rejected submission `0154e2e7-...` on 2026-05-28 with 2 issues:
 > Guideline 2.1(b) ("Weekly and Annual IAPs not submitted for review")
