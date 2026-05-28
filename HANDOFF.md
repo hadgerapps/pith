@@ -612,6 +612,94 @@ about 30 min.
 
 ---
 
+## Screenshot capture pipeline (real-simulator, set up 2026-05-28)
+
+After the cycle 2 rejection on Guideline 2.3.3 ("screenshots don't
+show the actual app in use"), we built a deterministic capture
+pipeline that boots iPhone 17 Pro Max + iPhone 17 Pro simulators,
+installs the Debug build with launch args `-uitest-seed` +
+`-uitest-screen <route>`, and captures the actually-running UI for
+each of 5 routes (today / record / paywall / threads / detail).
+
+```bash
+APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -name "PithVoice.app" \
+  -path "*Debug-iphonesimulator*" 2>/dev/null | head -1)
+MAX_UDID="F54322D2-F9A8-48DC-ABCE-4325C477E22B"  # iPhone 17 Pro Max
+PRO_UDID="37F37733-6ECC-4D9B-9371-DE7BF4FD6B6B"  # iPhone 17 Pro
+OUT="fastlane/screenshots/en-US"
+
+# Rebuild (regenerates xcodeproj from project.yml first)
+PATH="$PWD/.tooling/bin:$PATH" xcodegen generate
+xcodebuild -project PithVoice.xcodeproj -scheme PithVoice \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
+  -configuration Debug build
+
+# Capture for both devices
+for UDID in "$MAX_UDID:iPhone 17 Pro Max" "$PRO_UDID:iPhone 17 Pro"; do
+  U="${UDID%:*}"; P="${UDID#*:}"
+  xcrun simctl boot "$U" 2>&1 | grep -v already | head -1
+  sleep 4
+  xcrun simctl uninstall "$U" com.hadger.pith 2>/dev/null
+  xcrun simctl install "$U" "$APP_PATH"
+  for screen in today record paywall threads detail; do
+    xcrun simctl terminate "$U" com.hadger.pith 2>/dev/null
+    sleep 1
+    xcrun simctl launch "$U" com.hadger.pith \
+      -uitest-seed -uitest-screen "$screen" > /dev/null
+    sleep 6
+    case "$screen" in
+      today) N=01_Today;; record) N=02_Record;; paywall) N=03_Paywall;;
+      threads) N=04_Threads;; detail) N=05_Detail;;
+    esac
+    xcrun simctl io "$U" screenshot "$OUT/$P-$N.png"
+  done
+done
+
+# iPad Pro 12.9 letterbox of the new paywall (same Cream bg)
+python3 <<'PY'
+from PIL import Image
+src = "fastlane/screenshots/en-US/iPhone 17 Pro Max-03_Paywall.png"
+dst = "fastlane/screenshots/en-US/iPad Pro 12.9-paywall.png"
+TARGET = (2048, 2732)
+BG = (250, 250, 246)
+im = Image.open(src).convert("RGB")
+w, h = im.size
+scale = min(TARGET[0]/w, TARGET[1]/h)
+new = (int(w*scale), int(h*scale))
+im_r = im.resize(new, Image.LANCZOS)
+canvas = Image.new("RGB", TARGET, BG)
+canvas.paste(im_r, ((TARGET[0]-new[0])//2, (TARGET[1]-new[1])//2))
+canvas.save(dst, "PNG", optimize=True)
+PY
+```
+
+### Replace screenshots in ASC (when cycle 3 cancel+resubmit happens)
+
+Three sets to repopulate:
+
+| Set | ID | New filenames |
+|---|---|---|
+| IPHONE_67 (6.9") | `91a4162b-af78-4217-8dba-664e88a175e7` | iPhone 17 Pro Max-{01_Today..05_Detail}.png |
+| IPHONE_61 (6.1") | `3639c790-64be-4091-8fa0-5afba4dd6a25` | iPhone 17 Pro-{01..05}.png |
+| IPAD_PRO_3GEN_129 | `21fbdf4e-3878-47df-a023-9a519ae0a2d2` | iPad Pro 12.9-paywall.png |
+
+For each: GET set → for each existing screenshot DELETE
+`/v1/appScreenshots/{id}` → for each new PNG run the 3-step
+upload flow (POST `/v1/appScreenshots` reserve → PUT to S3 URL
+from `uploadOperations[0]` → PATCH `uploaded=true` with MD5 from
+`openssl md5 <file>`). See the inline Python in the 2026-05-28
+git commit history for a working version.
+
+### Routes — what each captures
+
+| Route | What appears |
+|---|---|
+| `today` | Wordmark + date + waveform + Rec button + 3 seeded entry cards + Today/Threads/Settings tab bar |
+| `record` | Same header but waveform = recording bars + serif-italic live partial transcript + Stop button (no real mic — `beginMockCapturing` paints the state) |
+| `paywall` | Full-screen PaywallView — "Keep showing up for yourself." + 3 plans (Annual best value $59.99, Lifetime $99.99, Weekly $4.99) + Subscribe + Subscription Disclosure block + "What stays on your iPhone" reassurance + Restore Purchases · Privacy · Terms |
+| `threads` | ThreadsView in Threads tab |
+| `detail` | EntryDetailView pushed for the first seeded entry — date + serif title + playback control + Summary + tag chips + Transcript |
+
 ## Quality gate runner
 
 Always green before pushing changes. Use this to verify after any
