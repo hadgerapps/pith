@@ -2,24 +2,28 @@ Pith Voice is a voice journal that runs entirely on the user's iPhone.
 
 WHAT THE APP DOES
 1. Records audio (AVAudioEngine).
-2. Transcribes speech on-device using Apple's SpeechAnalyzer / SFSpeechRecognizer API (Speech framework, iOS 26+).
+2. Transcribes speech on-device using Apple's Speech framework (iOS 26+).
 3. Generates a short summary and 2-4 thematic tags on-device using Apple's FoundationModels framework (Apple Intelligence, iOS 26+).
 4. Persists entries locally via SwiftData with NSFileProtectionComplete.
-5. Offers a paid subscription or lifetime IAP after 2 free entries (hard paywall, no free trial).
+5. Offers a paid subscription or lifetime IAP (hard paywall, no free trial).
+
+HOW TO VIEW / TEST THE IN-APP PURCHASES (fastest path)
+Open the Settings tab (bottom-right tab bar) and tap "View subscription options". The paywall appears immediately and shows all three In-App Purchases:
+- Pith Annual - com.hadger.pith.sub.annual - $59.99/year (auto-renewable)
+- Pith Lifetime - com.hadger.pith.iap.lifetime - $99.99 one-time (non-consumable)
+- Pith Weekly - com.hadger.pith.sub.weekly - $4.99/week (auto-renewable)
+Each plan has a purchase button. The Subscription Disclosure block, Restore Purchases button, and Privacy Policy / Terms of Use links are all visible on the same screen.
+
+ALTERNATIVE PATH (main flow)
+The paywall also triggers in normal use: on the Today tab, tap the Record button, then Stop (this creates an entry; speaking is optional). Do this twice. On the third Record tap the paywall is presented. Two free entries precede the hard paywall.
 
 VERIFYING THE ON-DEVICE CLAIM
-The app works fully in airplane mode after first launch. Reviewers can verify zero outbound traffic from the app process via Network Link Conditioner or any network proxy. The only outbound traffic the app participates in is StoreKit (Apple-controlled).
+The app works fully in airplane mode after first launch. Reviewers can verify zero outbound traffic via any network proxy. The only outbound traffic is StoreKit (Apple-controlled).
 
 DEVICE REQUIREMENT
-Pith Voice requires iPhone 15 Pro or newer (Apple Intelligence is a hard requirement for FoundationModels access). The app gracefully informs the user on unsupported devices with an explanatory screen rather than crashing.
+Pith Voice targets iPhone 15 Pro or newer. Recording and entry creation do not require Apple Intelligence to be enabled; on-device summarisation degrades gracefully if it is unavailable, and entries are still created, so the paywall remains reachable.
 
 PERMISSIONS
-- Microphone (NSMicrophoneUsageDescription): for recording entries.
-- Speech Recognition (NSSpeechRecognitionUsageDescription): for on-device transcription via SpeechAnalyzer / SFSpeechRecognizer.
-- Notifications (optional): weekly Threads digest only, opt-in.
-
-PAYWALL DEMO
-For Apple's reviewers, the paywall triggers after the 3rd entry attempt. To reach it in a single session, please record 2 short entries and then tap Record again. Reviewers may also use the 'Restore Purchases' flow with any Sandbox account.
-
-LIFETIME IAP
-The non-consumable com.hadger.pith.iap.lifetime ($99.99) is offered alongside the auto-renewable subscriptions, per the precedent set by Pillowtalk (id6484401671) and Murmur PVN (id6762516042). This is not a misrepresented subscription — it is a one-time purchase that grants permanent access to the same features, as the in-paywall copy and Subscription Disclosure block make explicit.
+- Microphone: for recording entries.
+- Speech Recognition: for on-device transcription.
+- Notifications (optional): weekly digest only, opt-in.
