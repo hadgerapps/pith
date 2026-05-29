@@ -59,6 +59,7 @@ struct RootTabView: View {
                 SettingsView(
                     onboarding: onboarding,
                     entitlements: entitlements,
+                    catalog: catalog,
                     controller: controller
                 )
                 .tag(Tab.settings)

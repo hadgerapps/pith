@@ -9,12 +9,14 @@ struct SettingsView: View {
     @Query(sort: \Entry.createdAt, order: .reverse) private var entries: [Entry]
     @Bindable var onboarding: OnboardingState
     let entitlements: EntitlementStore
+    let catalog: ProductCatalog
     let controller: PaywallController
 
     @State private var weeklyDigestOn = true
     @State private var exportInProgress = false
     @State private var exportError: String?
     @State private var shareURL: URL?
+    @State private var showPaywall = false
 
     var body: some View {
         NavigationStack {
@@ -49,6 +51,13 @@ struct SettingsView: View {
             )) { share in
                 ShareSheet(activityItems: [share.url])
             }
+            .sheet(isPresented: $showPaywall) {
+                PaywallView(
+                    catalog: catalog,
+                    controller: controller,
+                    onPurchased: { showPaywall = false }
+                )
+            }
         }
     }
 
@@ -65,6 +74,10 @@ struct SettingsView: View {
                 }
             } else {
                 row(label: "Status", value: "Free")
+                Button("View subscription options") {
+                    showPaywall = true
+                }
+                .foregroundStyle(DS.Color.accent)
             }
             Button("Restore purchases") {
                 Task { await controller.restore() }
