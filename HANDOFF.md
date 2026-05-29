@@ -1,7 +1,57 @@
 # Pith Voice — session handoff
 
-> **Status as of 2026-05-28 evening (CYCLE 3 REJECTED — fixes ready
-> locally, NOT yet uploaded to ASC):**
+> **Status as of 2026-05-29 evening (CYCLE 5 SUBMITTED — all 3 IAPs
+> riding for the first time):**
+>
+> ```
+> reviewSubmission 1f360c00-...   : WAITING_FOR_REVIEW (submitted 2026-05-29T17:49Z)
+> appStoreVersion 1.0              : WAITING_FOR_REVIEW, build 5
+> Pith Weekly   (6770545728)       : WAITING_FOR_REVIEW  ✅ rode
+> Pith Annual   (6770545519)       : WAITING_FOR_REVIEW  ✅ rode
+> Pith Lifetime (6770546034)       : WAITING_FOR_REVIEW  ✅ rode
+> ```
+>
+> **THE TWO LEARNINGS THAT ENDED THE 5-CYCLE 2.1(b) LOOP:**
+>
+> 1. **First-time subscriptions ride ONLY via the version-page binding
+>    dialog (UI-ONLY).** App Store Connect → App Version page →
+>    "In-App Purchases and Subscriptions" → "+" → check each sub that
+>    is in `READY_TO_SUBMIT` → it auto-saves. There is NO API for this:
+>    `reviewSubmissionItems` exposes no `subscription`/`inAppPurchaseV2`
+>    relationship, and `POST /v1/subscriptionSubmissions` returns
+>    `STATE_ERROR.FIRST_SUBSCRIPTION_MUST_BE_SUBMITTED_ON_VERSION`.
+>    The detection signal: after submit, the sub state flips
+>    `READY_TO_SUBMIT → WAITING_FOR_REVIEW`. If it stays
+>    `READY_TO_SUBMIT`, it did NOT ride (this was cycles 1-4).
+>    quirk #30's "auto-attach when READY_TO_SUBMIT at item-creation
+>    time" is WRONG for first-time IAPs — quirk #40 (version-page
+>    dialog) is correct.
+> 2. **A non-consumable IAP CAN be submitted standalone via API.**
+>    `POST /v1/inAppPurchaseSubmissions {inAppPurchaseV2: <id>}` → 201,
+>    moves it `DEVELOPER_ACTION_NEEDED/READY_TO_SUBMIT → WAITING_FOR_REVIEW`.
+>    This is how Lifetime rode (subs cannot use the sibling
+>    `subscriptionSubmissions` — that's blocked for first sub).
+>
+> **Cycle-4 (build 4) was rejected 2.1(b) "Information Needed — cannot
+> locate the In-App Purchases, such as Pith Lifetime, within the app."**
+> That is NOT a binding failure — Apple HAD the IAPs and started the
+> review; the reviewer just couldn't reach the hard paywall (gated
+> behind 2 recordings + a 3rd Record tap, with no visible upgrade
+> button). **Fix = build 5:** Settings → "View subscription options"
+> row (Free tier only) → presents PaywallView directly. Plus App Review
+> notes updated with the exact steps. NOTE: the `CYCLE_FIX_RECOMMENDATIONS.md`
+> quirk-#42 "screenshot uploaded:null" theory was a MISDIAGNOSIS for
+> Pith — these IAP review-screenshot resources never set `uploaded`
+> (it stays null even after an explicit PATCH); the real success signal
+> is `imageAsset` populated + `assetDeliveryState COMPLETE`. Re-uploaded
+> them anyway; harmless.
+>
+> **Next owner action (only after approval):** click "Release This
+> Version" when state moves to `PENDING_DEVELOPER_RELEASE`.
+>
+> ---
+>
+> <details><summary>Prior status (2026-05-28, CYCLE 3 REJECTED — archived)</summary>
 >
 > ```
 > reviewSubmission 811a54e3-...   : UNRESOLVED_ISSUES
@@ -102,6 +152,8 @@
 >
 > **Next owner action (only after approval):** click "Release This
 > Version" when state moves to `PENDING_DEVELOPER_RELEASE`.
+>
+> </details>
 
 ## NEW LEARNING — undocumented ASC API actions
 
